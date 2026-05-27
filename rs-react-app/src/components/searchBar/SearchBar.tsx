@@ -1,4 +1,4 @@
-import type { SearchBarProps } from '../../types/searchBarProps';
+import type { SearchBarProps } from '@/types/searchBarProps';
 
 const SearchBar = ({
   value,
@@ -13,18 +13,27 @@ const SearchBar = ({
   };
 
   return (
-    <div className="flex items-center max-w-md ">
+    <div className="flex items-center gap-2 w-full max-w-xl mx-auto">
       <input
         type="text"
         value={value}
         onChange={(e) => onChange(e.target.value)}
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
-        className="flex-1 h-10 px-4 text-sm border border-gray-300 rounded-md bg-white focus:outline-none focus:border-gray-500"
+        style={{
+          border: '1px solid var(--accent-border)',
+          background: 'var(--bg)',
+          color: 'var(--text-h)',
+        }}
+        className="flex-1 h-11 px-4 text-sm rounded-xl focus:outline-none focus:ring-2"
       />
       <button
         onClick={onSearch}
-        className="h-10 px-4 text-sm font-medium text-white bg-gray-900 rounded-md hover:bg-gray-700 transition-colors"
+        style={{
+          background: 'var(--accent)',
+          color: '#fff',
+        }}
+        className="h-11 px-6 text-sm font-medium rounded-xl hover:opacity-90 transition-opacity"
       >
         Search
       </button>
