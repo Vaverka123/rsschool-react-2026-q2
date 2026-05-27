@@ -1,3 +1,4 @@
+import ErrorTrigger from '@/components/errorBoundary/ErrorTrigger';
 import SearchBar from '@/components/searchBar/SearchBar';
 import SearchResults from '@/components/searchResults/SearchResults';
 
@@ -17,7 +18,10 @@ function HomePage() {
         </p>
       </div>
 
-      <SearchBar value={query} onChange={setQuery} onSearch={handleSearch} />
+      <div className="flex items-center gap-4">
+        <SearchBar value={query} onChange={setQuery} onSearch={handleSearch} />
+        <ErrorTrigger />
+      </div>
 
       <SearchResults results={results} loading={loading} error={error} />
     </div>
