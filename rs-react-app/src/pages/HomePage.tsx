@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 
 import SearchBar from '../components/searchBar/SearchBar';
+import useLocalStorage from '../hooks/useLocalStorage';
 
 interface Result {
   id: number;
@@ -10,7 +11,7 @@ interface Result {
 }
 
 function HomePage() {
-  const [query, setQuery] = useState('');
+  const [query, setQuery] = useLocalStorage('searchQuery', '');
   const [results, setResults] = useState<Result[]>([]);
   const [loading, setLoading] = useState(false);
   const [searched, setSearched] = useState(false);
