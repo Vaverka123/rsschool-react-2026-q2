@@ -4,7 +4,7 @@ import useLocalStorage from '@/hooks/useLocalStorage';
 
 import type { Character } from '@/types/character';
 
-import { fetchCharacters } from '@/api/rickAndMortyApi';
+import { ApiError, fetchCharacters } from '@/api/rickAndMortyApi';
 
 function useSearch() {
   const [query, setQuery] = useLocalStorage('search-query', '');
@@ -24,9 +24,13 @@ function useSearch() {
     try {
       const data = await fetchCharacters(term);
       setResults(data.results);
-    } catch {
-      setError('No characters found');
+    } catch (err) {
       setResults([]);
+      if (err instanceof ApiError) {
+        setError(err.message);
+      } else {
+        setError('Something went wrong. Please try again.');
+      }
     } finally {
       setLoading(false);
     }

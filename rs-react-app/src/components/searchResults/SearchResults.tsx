@@ -8,9 +8,21 @@ const SKELETON_COUNT = 20;
 function SearchResults({ results, loading, error }: SearchResultsProps) {
   if (error) {
     return (
-      <p style={{ color: '#ef4444' }} className="text-sm py-8">
+      <div
+        style={{
+          border: '1px solid rgba(239,68,68,0.3)',
+          background: 'rgba(239,68,68,0.05)',
+          color: '#ef4444',
+        }}
+        className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm"
+      >
+        <i
+          className="ti ti-alert-circle"
+          style={{ fontSize: 18 }}
+          aria-hidden="true"
+        />
         {error}
-      </p>
+      </div>
     );
   }
 
