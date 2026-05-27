@@ -4,7 +4,7 @@ import reactHooks from 'eslint-plugin-react-hooks';
 import reactRefresh from 'eslint-plugin-react-refresh';
 import tseslint from 'typescript-eslint';
 import { defineConfig, globalIgnores } from 'eslint/config';
-import importPlugin from 'eslint-plugin-import';
+import simpleImportSort from 'eslint-plugin-simple-import-sort';
 
 export default defineConfig([
   globalIgnores(['dist']),
@@ -17,26 +17,29 @@ export default defineConfig([
       reactRefresh.configs.vite,
     ],
     plugins: {
-      import: importPlugin,
+      'simple-import-sort': simpleImportSort,
     },
     languageOptions: {
       globals: globals.browser,
     },
     rules: {
-      'import/order': [
+      'simple-import-sort/imports': [
         'error',
         {
           groups: [
-            'builtin',
-            'external',
-            'internal',
-            'parent',
-            'sibling',
-            'index',
+            ['^react', '^react-router'], // react first
+            ['^@?\\w'], // other libs
+            ['^@/components'], // components
+            ['^@/hooks'], // hooks
+            ['^@/store', '^@/context'], // state
+            ['^@/utils', '^@/services'], // utils / api
+            ['^@/types'], // types
+            ['^\\.'], // relative imports
+            ['\\.css$'], // css last
           ],
-          'newlines-between': 'always',
         },
       ],
+      'simple-import-sort/exports': 'error',
     },
   },
 ]);
