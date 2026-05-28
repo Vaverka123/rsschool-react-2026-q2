@@ -1,8 +1,4 @@
-import type { Character } from '@/types/character';
-
-interface Props {
-  character: Character;
-}
+import type { Character, CharacterCardProps } from '@/types/character';
 
 const statusColor: Record<Character['status'], string> = {
   Alive: '#22c55e',
@@ -10,7 +6,7 @@ const statusColor: Record<Character['status'], string> = {
   unknown: '#9ca3af',
 };
 
-function CharacterCard({ character }: Props) {
+function CharacterCard({ character }: CharacterCardProps) {
   return (
     <li
       style={{

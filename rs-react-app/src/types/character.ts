@@ -17,4 +17,8 @@ type ApiResponse = {
   };
 };
 
-export type { ApiResponse, Character };
+type CharacterCardProps = {
+  character: Character;
+};
+
+export type { ApiResponse, Character, CharacterCardProps };
