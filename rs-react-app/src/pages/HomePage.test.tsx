@@ -13,18 +13,17 @@ import { renderWithProviders } from '@/test-utils/renderWithProviders';
 vi.mock('@/api/rickAndMortyApi', () => ({
   fetchCharacters: vi.fn(),
   ApiError: class ApiError extends Error {
-    constructor(
-      public status: number,
-      message: string
-    ) {
+    status: number;
+    constructor(status: number, message: string) {
       super(message);
       this.name = 'ApiError';
+      this.status = status;
     }
   },
 }));
 
 vi.mock('@/hooks/useLocalStorage', () => ({
-  default: vi.fn((_, initialValue) => {
+  default: vi.fn((_: string, initialValue: string) => {
     const [value, setValue] = useState(initialValue);
     return [value, setValue];
   }),
@@ -40,7 +39,7 @@ beforeEach(() => {
 
 describe('HomePage', () => {
   describe('rendering', () => {
-    it('renders page title', async () => {
+    it('renders page title', () => {
       renderWithProviders(<HomePage />);
       expect(screen.getByText('Rick & Morty')).toBeInTheDocument();
     });
@@ -94,7 +93,7 @@ describe('HomePage', () => {
       await userEvent.click(screen.getByRole('button', { name: /^search$/i }));
 
       await waitFor(() =>
-        expect(fetchCharacters).toHaveBeenCalledWith('Morty')
+        expect(fetchCharacters).toHaveBeenCalledWith('Morty', 1)
       );
     });
 

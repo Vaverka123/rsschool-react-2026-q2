@@ -19,10 +19,15 @@ const ERROR_MESSAGES: Record<number, string> = {
   503: 'Service unavailable. Please try again later.',
 };
 
-export async function fetchCharacters(name: string): Promise<ApiResponse> {
-  const url = name.trim()
-    ? `${BASE_URL}/character?name=${encodeURIComponent(name)}`
-    : `${BASE_URL}/character`;
+export async function fetchCharacters(
+  name: string,
+  page: number = 1
+): Promise<ApiResponse> {
+  const params = new URLSearchParams();
+  if (name.trim()) params.set('name', name.trim());
+  params.set('page', String(page));
+
+  const url = `${BASE_URL}/character?${params.toString()}`;
 
   let response: Response;
 

@@ -31,5 +31,5 @@ export const mockCharacters: Character[] = [
 
 export const mockApiResponse = {
   results: mockCharacters,
-  info: { count: 3, pages: 1 },
+  info: { count: 3, pages: 1, next: null, prev: null },
 };

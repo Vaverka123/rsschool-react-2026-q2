@@ -18,7 +18,7 @@ describe('fetchCharacters', () => {
 
       const result = await fetchCharacters('');
       expect(fetch).toHaveBeenCalledWith(
-        'https://rickandmortyapi.com/api/character'
+        'https://rickandmortyapi.com/api/character?page=1'
       );
       expect(result.results).toHaveLength(3);
     });
@@ -31,7 +31,7 @@ describe('fetchCharacters', () => {
 
       await fetchCharacters('Rick');
       expect(fetch).toHaveBeenCalledWith(
-        'https://rickandmortyapi.com/api/character?name=Rick'
+        'https://rickandmortyapi.com/api/character?name=Rick&page=1'
       );
     });
 
@@ -43,7 +43,7 @@ describe('fetchCharacters', () => {
 
       await fetchCharacters('Rick & Morty');
       expect(fetch).toHaveBeenCalledWith(
-        'https://rickandmortyapi.com/api/character?name=Rick%20%26%20Morty'
+        'https://rickandmortyapi.com/api/character?name=Rick+%26+Morty&page=1'
       );
     });
 
@@ -55,7 +55,19 @@ describe('fetchCharacters', () => {
 
       await fetchCharacters('   ');
       expect(fetch).toHaveBeenCalledWith(
-        'https://rickandmortyapi.com/api/character'
+        'https://rickandmortyapi.com/api/character?page=1'
+      );
+    });
+
+    it('uses correct page number', async () => {
+      vi.mocked(fetch).mockResolvedValueOnce({
+        ok: true,
+        json: async () => mockApiResponse,
+      } as Response);
+
+      await fetchCharacters('Rick', 3);
+      expect(fetch).toHaveBeenCalledWith(
+        'https://rickandmortyapi.com/api/character?name=Rick&page=3'
       );
     });
   });
