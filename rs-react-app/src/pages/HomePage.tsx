@@ -1,3 +1,5 @@
+import { Outlet, useNavigate, useSearchParams } from 'react-router-dom';
+
 import ErrorTrigger from '@/components/errorBoundary/ErrorTrigger';
 import Pagination from '@/components/pagination/Pagination';
 import SearchBar from '@/components/searchBar/SearchBar';
@@ -18,6 +20,17 @@ function HomePage() {
     handlePageChange,
   } = useSearch();
 
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+  const hasDetails = searchParams.get('details') !== null;
+
+  const handleMainClick = () => {
+    if (!hasDetails) return;
+    const params = new URLSearchParams(searchParams);
+    params.delete('details');
+    navigate(`?${params.toString()}`);
+  };
+
   return (
     <div className="flex flex-col gap-8 px-6 py-8">
       <div className="flex flex-col gap-2">
@@ -33,15 +46,26 @@ function HomePage() {
         <ErrorTrigger />
       </div>
 
-      <SearchResults results={results} loading={loading} error={error} />
+      <div
+        className={`grid gap-6 ${hasDetails ? 'grid-cols-[1fr_360px]' : 'grid-cols-1'}`}
+      >
+        <div onClick={handleMainClick}>
+          <SearchResults results={results} loading={loading} error={error} />
+          {!loading && !error && (
+            <Pagination
+              currentPage={currentPage}
+              totalPages={totalPages}
+              onPageChange={handlePageChange}
+            />
+          )}
+        </div>
 
-      {!loading && !error && (
-        <Pagination
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={handlePageChange}
-        />
-      )}
+        {hasDetails && (
+          <div className="sticky top-4 self-start">
+            <Outlet />
+          </div>
+        )}
+      </div>
     </div>
   );
 }

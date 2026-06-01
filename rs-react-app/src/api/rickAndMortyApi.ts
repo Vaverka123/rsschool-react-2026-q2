@@ -1,4 +1,4 @@
-import type { ApiResponse } from '@/types/character';
+import type { ApiResponse, CharacterDetail } from '@/types/character';
 
 const BASE_URL = 'https://rickandmortyapi.com/api';
 
@@ -33,6 +33,25 @@ export async function fetchCharacters(
 
   try {
     response = await fetch(url);
+  } catch {
+    throw new ApiError(0, 'Network error — check your internet connection.');
+  }
+
+  if (!response.ok) {
+    const message =
+      ERROR_MESSAGES[response.status] ??
+      `Unexpected error (${response.status}). Please try again.`;
+    throw new ApiError(response.status, message);
+  }
+
+  return response.json();
+}
+
+export async function fetchCharacter(id: number): Promise<CharacterDetail> {
+  let response: Response;
+
+  try {
+    response = await fetch(`${BASE_URL}/character/${id}`);
   } catch {
     throw new ApiError(0, 'Network error — check your internet connection.');
   }

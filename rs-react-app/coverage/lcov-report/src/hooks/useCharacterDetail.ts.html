@@ -3,7 +3,7 @@
 <html lang="en">
 
 <head>
-    <title>Code coverage report for src/api/rickAndMortyApi.ts</title>
+    <title>Code coverage report for src/hooks/useCharacterDetail.ts</title>
     <meta charset="utf-8" />
     <link rel="stylesheet" href="../../prettify.css" />
     <link rel="stylesheet" href="../../base.css" />
@@ -19,34 +19,34 @@
 <body>
 <div class='wrapper'>
     <div class='pad1'>
-        <h1><a href="../../index.html">All files</a> / <a href="index.html">src/api</a> rickAndMortyApi.ts</h1>
+        <h1><a href="../../index.html">All files</a> / <a href="index.html">src/hooks</a> useCharacterDetail.ts</h1>
         <div class='clearfix'>
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">70.83% </span>
+                <span class="strong">92.85% </span>
                 <span class="quiet">Statements</span>
-                <span class='fraction'>17/24</span>
-            </div>
-        
-            
-            <div class='fl pad1y space-right2'>
-                <span class="strong">63.63% </span>
-                <span class="quiet">Branches</span>
-                <span class='fraction'>7/11</span>
+                <span class='fraction'>26/28</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
                 <span class="strong">66.66% </span>
-                <span class="quiet">Functions</span>
-                <span class='fraction'>2/3</span>
+                <span class="quiet">Branches</span>
+                <span class='fraction'>8/12</span>
             </div>
         
             
             <div class='fl pad1y space-right2'>
-                <span class="strong">69.56% </span>
+                <span class="strong">100% </span>
+                <span class="quiet">Functions</span>
+                <span class='fraction'>9/9</span>
+            </div>
+        
+            
+            <div class='fl pad1y space-right2'>
+                <span class="strong">100% </span>
                 <span class="quiet">Lines</span>
-                <span class='fraction'>16/23</span>
+                <span class='fraction'>24/24</span>
             </div>
         
             
@@ -61,7 +61,7 @@
             </div>
         </template>
     </div>
-    <div class='status-line medium'></div>
+    <div class='status-line high'></div>
     <pre><table class="coverage">
 <tr><td class="line-count quiet"><a name='L1'></a><a href='#L1'>1</a>
 <a name='L2'></a><a href='#L2'>2</a>
@@ -119,151 +119,118 @@
 <a name='L54'></a><a href='#L54'>54</a>
 <a name='L55'></a><a href='#L55'>55</a>
 <a name='L56'></a><a href='#L56'>56</a>
-<a name='L57'></a><a href='#L57'>57</a>
-<a name='L58'></a><a href='#L58'>58</a>
-<a name='L59'></a><a href='#L59'>59</a>
-<a name='L60'></a><a href='#L60'>60</a>
-<a name='L61'></a><a href='#L61'>61</a>
-<a name='L62'></a><a href='#L62'>62</a>
-<a name='L63'></a><a href='#L63'>63</a>
-<a name='L64'></a><a href='#L64'>64</a>
-<a name='L65'></a><a href='#L65'>65</a>
-<a name='L66'></a><a href='#L66'>66</a>
-<a name='L67'></a><a href='#L67'>67</a>
-<a name='L68'></a><a href='#L68'>68</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">10x</span>
-<span class="cline-any cline-yes">10x</span>
-<span class="cline-any cline-yes">10x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">1x</span>
+<a name='L57'></a><a href='#L57'>57</a></td><td class="line-coverage quiet"><span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">27x</span>
+<span class="cline-any cline-yes">27x</span>
+<span class="cline-any cline-yes">27x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">27x</span>
+<span class="cline-any cline-yes">15x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">7x</span>
+<span class="cline-any cline-yes">7x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">4x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">12x</span>
-<span class="cline-any cline-yes">12x</span>
-<span class="cline-any cline-yes">12x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">12x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">12x</span>
-<span class="cline-any cline-yes">12x</span>
+<span class="cline-any cline-yes">4x</span>
+<span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-yes">2x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">10x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-yes">5x</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">11x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
+<span class="cline-any cline-yes">11x</span>
+<span class="cline-any cline-yes">11x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
+<span class="cline-any cline-yes">27x</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
 <span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-no">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span>
-<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import type { ApiResponse, CharacterDetail } from '@/types/character';
+<span class="cline-any cline-neutral">&nbsp;</span></td><td class="text"><pre class="prettyprint lang-js">import { useEffect, useState } from 'react';
 &nbsp;
-const BASE_URL = 'https://rickandmortyapi.com/api';
+import type { CharacterDetail } from '@/types/character';
 &nbsp;
-export class ApiError extends Error {
-  public status: number;
+import { ApiError, fetchCharacter } from '@/api/rickAndMortyApi';
 &nbsp;
-  constructor(status: number, message: string) {
-    super(message);
-    this.status = status;
-    this.name = 'ApiError';
-  }
+function useCharacterDetail(id: number | null) {
+  const [character, setCharacter] = useState&lt;CharacterDetail | null&gt;(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState&lt;string | null&gt;(null);
+&nbsp;
+  useEffect(() =&gt; {
+    if (id === null) {
+      // Avoid synchronous setState inside effect to prevent cascading renders
+      const t = setTimeout(() =&gt; setCharacter(null), 0);
+      return () =&gt; clearTimeout(t);
+    }
+&nbsp;
+    let isActive = true;
+&nbsp;
+    Promise.resolve().then(() =&gt; {
+      <span class="missing-if-branch" title="if path not taken" >I</span>if (!isActive) <span class="cstat-no" title="statement not covered" >return;</span>
+      setLoading(true);
+      setError(null);
+    });
+&nbsp;
+    fetchCharacter(id)
+      .then((result) =&gt; {
+        <span class="missing-if-branch" title="else path not taken" >E</span>if (isActive) {
+          setCharacter(result);
+        }
+      })
+      .catch((err) =&gt; {
+        <span class="missing-if-branch" title="if path not taken" >I</span>if (!isActive) <span class="cstat-no" title="statement not covered" >return;</span>
+&nbsp;
+        if (err instanceof ApiError) {
+          setError(err.message);
+        } else {
+          setError('Something went wrong.');
+        }
+      })
+      .finally(() =&gt; {
+        <span class="missing-if-branch" title="else path not taken" >E</span>if (isActive) {
+          setLoading(false);
+        }
+      });
+&nbsp;
+    return () =&gt; {
+      isActive = false;
+    };
+  }, [id]);
+&nbsp;
+  return { character, loading, error };
 }
 &nbsp;
-const ERROR_MESSAGES: Record&lt;number, string&gt; = {
-  404: 'No characters found for your search.',
-  429: 'Too many requests — please wait a moment and try again.',
-  500: 'The server is having issues. Please try again later.',
-  503: 'Service unavailable. Please try again later.',
-};
-&nbsp;
-export async function fetchCharacters(
-  name: string,
-  page: number = 1
-): Promise&lt;ApiResponse&gt; {
-  const params = new URLSearchParams();
-  if (name.trim()) params.set('name', name.trim());
-  params.set('page', String(page));
-&nbsp;
-  const url = `${BASE_URL}/character?${params.toString()}`;
-&nbsp;
-  let response: Response;
-&nbsp;
-  try {
-    response = await fetch(url);
-  } catch {
-    throw new ApiError(0, 'Network error — check your internet connection.');
-  }
-&nbsp;
-  if (!response.ok) {
-    const message =
-      ERROR_MESSAGES[response.status] ??
-      `Unexpected error (${response.status}). Please try again.`;
-    throw new ApiError(response.status, message);
-  }
-&nbsp;
-  return response.json();
-}
-&nbsp;
-export async function <span class="fstat-no" title="function not covered" >fetchCharacter(i</span>d: number): Promise&lt;CharacterDetail&gt; {
-  let response: Response;
-&nbsp;
-<span class="cstat-no" title="statement not covered" >  try {</span>
-<span class="cstat-no" title="statement not covered" >    response = await fetch(`${BASE_URL}/character/${id}`);</span>
-  } catch {
-<span class="cstat-no" title="statement not covered" >    throw new ApiError(0, 'Network error — check your internet connection.');</span>
-  }
-&nbsp;
-<span class="cstat-no" title="statement not covered" >  if (!response.ok) {</span>
-    const message =
-<span class="cstat-no" title="statement not covered" >      ERROR_MESSAGES[response.status] ??</span>
-      `Unexpected error (${response.status}). Please try again.`;
-<span class="cstat-no" title="statement not covered" >    throw new ApiError(response.status, message);</span>
-  }
-&nbsp;
-<span class="cstat-no" title="statement not covered" >  return response.json();</span>
-}
+export default useCharacterDetail;
 &nbsp;</pre></td></tr></table></pre>
 
                 <div class='push'></div><!-- for sticky footer -->

@@ -23,4 +23,11 @@ type CharacterCardProps = {
   character: Character;
 };
 
-export type { ApiResponse, Character, CharacterCardProps };
+type CharacterDetail = Character & {
+  type: string;
+  gender: string;
+  origin: { name: string };
+  episode: string[];
+};
+
+export type { ApiResponse, Character, CharacterCardProps, CharacterDetail };

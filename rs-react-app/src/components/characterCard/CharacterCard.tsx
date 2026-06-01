@@ -1,3 +1,5 @@
+import { useNavigate, useSearchParams } from 'react-router-dom';
+
 import type { Character, CharacterCardProps } from '@/types/character';
 
 const statusColor: Record<Character['status'], string> = {
@@ -7,12 +9,26 @@ const statusColor: Record<Character['status'], string> = {
 };
 
 function CharacterCard({ character }: CharacterCardProps) {
+  const [searchParams] = useSearchParams();
+  const navigate = useNavigate();
+
+  const isSelected = searchParams.get('details') === String(character.id);
+
+  const handleClick = (e: React.MouseEvent<HTMLLIElement>) => {
+    e.stopPropagation();
+    const params = new URLSearchParams(searchParams);
+    params.set('details', String(character.id));
+    navigate(`?${params.toString()}`);
+  };
+
   return (
     <li
+      onClick={handleClick}
       style={{
-        border: '1px solid var(--border)',
+        border: `1px solid ${isSelected ? 'var(--accent)' : 'var(--border)'}`,
         background: 'var(--bg)',
         boxShadow: 'var(--shadow)',
+        cursor: 'pointer',
       }}
       className="flex flex-col rounded-2xl overflow-hidden hover:scale-[1.02] transition-transform"
     >
