@@ -7,31 +7,41 @@ import { renderWithProviders } from '@/test-utils/renderWithProviders';
 
 describe('AboutPage', () => {
   describe('rendering', () => {
-    it('renders heading', () => {
+    it('renders page heading', () => {
       renderWithProviders(<AboutPage />);
       expect(screen.getByText('About This App')).toBeInTheDocument();
     });
 
-    it('renders description text', () => {
+    it('renders author name', () => {
       renderWithProviders(<AboutPage />);
-      expect(
-        screen.getByText(/simple React application built with Vite/i)
-      ).toBeInTheDocument();
+      expect(screen.getByText(/vera maslava/i)).toBeInTheDocument();
     });
 
-    it('renders github link', () => {
+    it('renders RS School course link', () => {
       renderWithProviders(<AboutPage />);
-      const link = screen.getByRole('link', { name: /github/i });
+      const link = screen.getByRole('link', {
+        name: /rs school react course/i,
+      });
       expect(link).toBeInTheDocument();
-      expect(link).toHaveAttribute(
-        'href',
-        'https://github.com/your-username/react-vite-app'
-      );
+      expect(link).toHaveAttribute('href', 'https://rs.school/courses/reactjs');
+    });
+
+    it('renders RS School link opening in new tab', () => {
+      renderWithProviders(<AboutPage />);
+      const link = screen.getByRole('link', {
+        name: /rs school react course/i,
+      });
+      expect(link).toHaveAttribute('target', '_blank');
     });
 
     it('renders home navigation link', () => {
       renderWithProviders(<AboutPage />);
       expect(screen.getByRole('link', { name: /home/i })).toBeInTheDocument();
+    });
+
+    it('renders app description', () => {
+      renderWithProviders(<AboutPage />);
+      expect(screen.getByText(/rick and morty api/i)).toBeInTheDocument();
     });
   });
 

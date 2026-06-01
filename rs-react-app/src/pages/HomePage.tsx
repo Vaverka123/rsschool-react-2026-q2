@@ -1,4 +1,4 @@
-import { Outlet, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, Outlet, useNavigate, useSearchParams } from 'react-router-dom';
 
 import ErrorTrigger from '@/components/errorBoundary/ErrorTrigger';
 import Pagination from '@/components/pagination/Pagination';
@@ -33,6 +33,13 @@ function HomePage() {
 
   return (
     <div className="flex flex-col gap-8 px-6 py-8">
+      <Link
+        to="/about"
+        style={{ color: 'var(--accent)' }}
+        className="p-4 border-2 border-accent rounded-2xl text-lg  hover:opacity-70 transition-opacity"
+      >
+        About
+      </Link>
       <div className="flex flex-col gap-2">
         <h1 style={{ color: 'var(--accent)' }}>Rick & Morty</h1>
         <p style={{ color: 'var(--text)' }} className="text-sm">
@@ -40,12 +47,10 @@ function HomePage() {
           <span style={{ color: 'var(--green)' }}>826 characters</span>
         </p>
       </div>
-
       <div className="flex items-center gap-4">
         <SearchBar value={query} onChange={setQuery} onSearch={handleSearch} />
         <ErrorTrigger />
       </div>
-
       <div
         className={`grid gap-6 ${hasDetails ? 'grid-cols-[1fr_360px]' : 'grid-cols-1'}`}
       >
