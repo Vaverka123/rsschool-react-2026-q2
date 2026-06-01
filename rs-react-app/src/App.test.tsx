@@ -74,5 +74,14 @@ describe('App', () => {
         expect(screen.getByText('Rick Sanchez')).toBeInTheDocument();
       });
     });
+
+    it('renders 404 page for unknown route', () => {
+      renderWithMemoryRouter(
+        <MemoryRouter initialEntries={['/unknown-route']}>
+          <App />
+        </MemoryRouter>
+      );
+      expect(screen.getByText('404')).toBeInTheDocument();
+    });
   });
 });
