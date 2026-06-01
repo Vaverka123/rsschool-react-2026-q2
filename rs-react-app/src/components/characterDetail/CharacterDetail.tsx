@@ -2,15 +2,19 @@ import { useNavigate, useSearchParams } from 'react-router-dom';
 
 import useCharacterDetail from '@/hooks/useCharacterDetail';
 
+import { useSetSelectedId } from '@/store/characterStore';
+
 function CharacterDetail() {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const setSelectedId = useSetSelectedId();
   const detailsId = searchParams.get('details');
   const id = detailsId ? Number(detailsId) : null;
 
   const { character, loading, error } = useCharacterDetail(id);
 
   const handleClose = () => {
+    setSelectedId(null);
     const params = new URLSearchParams(searchParams);
     params.delete('details');
     navigate(`?${params.toString()}`);

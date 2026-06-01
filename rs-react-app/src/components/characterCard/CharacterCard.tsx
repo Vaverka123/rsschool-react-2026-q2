@@ -1,5 +1,7 @@
 import { useNavigate, useSearchParams } from 'react-router-dom';
 
+import { useSelectedId, useSetSelectedId } from '@/store/characterStore';
+
 import type { Character, CharacterCardProps } from '@/types/character';
 
 const statusColor: Record<Character['status'], string> = {
@@ -12,10 +14,14 @@ function CharacterCard({ character }: CharacterCardProps) {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
-  const isSelected = searchParams.get('details') === String(character.id);
+  // const isSelected = searchParams.get('details') === String(character.id);
+  const selectedId = useSelectedId();
+  const setSelectedId = useSetSelectedId();
+  const isSelected = selectedId === character.id;
 
   const handleClick = (e: React.MouseEvent<HTMLLIElement>) => {
     e.stopPropagation();
+    setSelectedId(character.id);
     const params = new URLSearchParams(searchParams);
     params.set('details', String(character.id));
     navigate(`?${params.toString()}`);
