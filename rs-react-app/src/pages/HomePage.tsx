@@ -8,7 +8,11 @@ import SelectedItemsPanel from '@/components/selectedItems/SelectedItemsPanel';
 
 import useSearch from '@/hooks/useSearch';
 
-import { useSelectedId, useSetSelectedId } from '@/store/characterStore';
+import {
+  useCheckedItems,
+  useSelectedId,
+  useSetSelectedId,
+} from '@/store/characterStore';
 
 function HomePage() {
   const {
@@ -25,7 +29,9 @@ function HomePage() {
 
   const selectedId = useSelectedId();
   const setSelectedId = useSetSelectedId();
+  const checkedItems = useCheckedItems();
   const hasDetails = selectedId !== null;
+  const hasFlyout = checkedItems.length > 0;
 
   const handleMainClick = () => {
     if (!hasDetails) return;
@@ -33,7 +39,7 @@ function HomePage() {
   };
 
   return (
-    <div className="flex flex-col gap-8 px-6 py-8">
+    <div className={`flex flex-col gap-8 px-6 py-8 ${hasFlyout ? 'pb-24' : ''}`}>
       <Link
         to="/about"
         style={{ color: 'var(--accent)' }}

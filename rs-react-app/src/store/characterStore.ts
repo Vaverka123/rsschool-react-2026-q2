@@ -1,32 +1,34 @@
 import { create } from 'zustand';
 
+import type { Character } from '@/types/character';
+
 interface CharacterStore {
   selectedId: number | null;
   setSelectedId: (id: number | null) => void;
-  checkedIds: number[];
-  toggleCheckedId: (id: number) => void;
-  clearCheckedIds: () => void;
+  checkedItems: Character[];
+  toggleCheckedItem: (character: Character) => void;
+  clearCheckedItems: () => void;
 }
 
 const useCharacterStore = create<CharacterStore>((set) => ({
   selectedId: null,
   setSelectedId: (id) => set({ selectedId: id }),
-  checkedIds: [],
-  toggleCheckedId: (id) =>
+  checkedItems: [],
+  toggleCheckedItem: (character) =>
     set((state) => ({
-      checkedIds: state.checkedIds.includes(id)
-        ? state.checkedIds.filter((i) => i !== id)
-        : [...state.checkedIds, id],
+      checkedItems: state.checkedItems.some((c) => c.id === character.id)
+        ? state.checkedItems.filter((c) => c.id !== character.id)
+        : [...state.checkedItems, character],
     })),
-  clearCheckedIds: () => set({ checkedIds: [] }),
+  clearCheckedItems: () => set({ checkedItems: [] }),
 }));
 
 export const useSelectedId = () => useCharacterStore((s) => s.selectedId);
 export const useSetSelectedId = () => useCharacterStore((s) => s.setSelectedId);
-export const useCheckedIds = () => useCharacterStore((s) => s.checkedIds);
-export const useToggleCheckedId = () =>
-  useCharacterStore((s) => s.toggleCheckedId);
-export const useClearCheckedIds = () =>
-  useCharacterStore((s) => s.clearCheckedIds);
+export const useCheckedItems = () => useCharacterStore((s) => s.checkedItems);
+export const useToggleCheckedItem = () =>
+  useCharacterStore((s) => s.toggleCheckedItem);
+export const useClearCheckedItems = () =>
+  useCharacterStore((s) => s.clearCheckedItems);
 
 export default useCharacterStore;

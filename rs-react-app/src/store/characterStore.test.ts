@@ -1,16 +1,18 @@
 import { act, renderHook } from '@testing-library/react';
 
+import { mockCharacter, mockCharacters } from '@/test-utils/mocks';
+
 import useCharacterStore, {
-  useCheckedIds,
-  useClearCheckedIds,
+  useCheckedItems,
+  useClearCheckedItems,
   useSelectedId,
   useSetSelectedId,
-  useToggleCheckedId,
+  useToggleCheckedItem,
 } from './characterStore';
 
 beforeEach(() => {
   act(() =>
-    useCharacterStore.setState({ selectedId: null, checkedIds: [] })
+    useCharacterStore.setState({ selectedId: null, checkedItems: [] })
   );
 });
 
@@ -21,8 +23,8 @@ describe('characterStore', () => {
       expect(result.current).toBeNull();
     });
 
-    it('checkedIds is empty by default', () => {
-      const { result } = renderHook(() => useCheckedIds());
+    it('checkedItems is empty by default', () => {
+      const { result } = renderHook(() => useCheckedItems());
       expect(result.current).toEqual([]);
     });
   });
@@ -61,91 +63,91 @@ describe('characterStore', () => {
     });
   });
 
-  describe('toggleCheckedId', () => {
-    it('adds id to checkedIds when not present', () => {
+  describe('toggleCheckedItem', () => {
+    it('adds character to checkedItems when not present', () => {
       const { result } = renderHook(() => ({
-        checkedIds: useCheckedIds(),
-        toggleCheckedId: useToggleCheckedId(),
+        checkedItems: useCheckedItems(),
+        toggleCheckedItem: useToggleCheckedItem(),
       }));
 
-      act(() => result.current.toggleCheckedId(1));
-      expect(result.current.checkedIds).toEqual([1]);
+      act(() => result.current.toggleCheckedItem(mockCharacter));
+      expect(result.current.checkedItems).toEqual([mockCharacter]);
     });
 
-    it('removes id from checkedIds when already present', () => {
+    it('removes character from checkedItems when already present', () => {
       const { result } = renderHook(() => ({
-        checkedIds: useCheckedIds(),
-        toggleCheckedId: useToggleCheckedId(),
+        checkedItems: useCheckedItems(),
+        toggleCheckedItem: useToggleCheckedItem(),
       }));
 
-      act(() => result.current.toggleCheckedId(1));
-      act(() => result.current.toggleCheckedId(1));
-      expect(result.current.checkedIds).toEqual([]);
+      act(() => result.current.toggleCheckedItem(mockCharacter));
+      act(() => result.current.toggleCheckedItem(mockCharacter));
+      expect(result.current.checkedItems).toEqual([]);
     });
 
-    it('can select multiple ids independently', () => {
+    it('can select multiple characters independently', () => {
       const { result } = renderHook(() => ({
-        checkedIds: useCheckedIds(),
-        toggleCheckedId: useToggleCheckedId(),
+        checkedItems: useCheckedItems(),
+        toggleCheckedItem: useToggleCheckedItem(),
       }));
 
-      act(() => result.current.toggleCheckedId(1));
-      act(() => result.current.toggleCheckedId(3));
-      act(() => result.current.toggleCheckedId(5));
-      expect(result.current.checkedIds).toEqual([1, 3, 5]);
+      act(() => result.current.toggleCheckedItem(mockCharacters[0]));
+      act(() => result.current.toggleCheckedItem(mockCharacters[1]));
+      act(() => result.current.toggleCheckedItem(mockCharacters[2]));
+      expect(result.current.checkedItems).toHaveLength(3);
     });
 
-    it('only removes the toggled id, leaving others intact', () => {
+    it('only removes the toggled character, leaving others intact', () => {
       const { result } = renderHook(() => ({
-        checkedIds: useCheckedIds(),
-        toggleCheckedId: useToggleCheckedId(),
+        checkedItems: useCheckedItems(),
+        toggleCheckedItem: useToggleCheckedItem(),
       }));
 
-      act(() => result.current.toggleCheckedId(1));
-      act(() => result.current.toggleCheckedId(2));
-      act(() => result.current.toggleCheckedId(1));
-      expect(result.current.checkedIds).toEqual([2]);
-    });
-  });
-
-  describe('clearCheckedIds', () => {
-    it('removes all checked ids', () => {
-      const { result } = renderHook(() => ({
-        checkedIds: useCheckedIds(),
-        toggleCheckedId: useToggleCheckedId(),
-        clearCheckedIds: useClearCheckedIds(),
-      }));
-
-      act(() => result.current.toggleCheckedId(1));
-      act(() => result.current.toggleCheckedId(2));
-      act(() => result.current.clearCheckedIds());
-      expect(result.current.checkedIds).toEqual([]);
-    });
-
-    it('is a no-op when checkedIds is already empty', () => {
-      const { result } = renderHook(() => ({
-        checkedIds: useCheckedIds(),
-        clearCheckedIds: useClearCheckedIds(),
-      }));
-
-      act(() => result.current.clearCheckedIds());
-      expect(result.current.checkedIds).toEqual([]);
+      act(() => result.current.toggleCheckedItem(mockCharacters[0]));
+      act(() => result.current.toggleCheckedItem(mockCharacters[1]));
+      act(() => result.current.toggleCheckedItem(mockCharacters[0]));
+      expect(result.current.checkedItems).toEqual([mockCharacters[1]]);
     });
   });
 
-  describe('selectedId and checkedIds are independent', () => {
-    it('toggling checkedId does not affect selectedId', () => {
+  describe('clearCheckedItems', () => {
+    it('removes all checked items', () => {
+      const { result } = renderHook(() => ({
+        checkedItems: useCheckedItems(),
+        toggleCheckedItem: useToggleCheckedItem(),
+        clearCheckedItems: useClearCheckedItems(),
+      }));
+
+      act(() => result.current.toggleCheckedItem(mockCharacters[0]));
+      act(() => result.current.toggleCheckedItem(mockCharacters[1]));
+      act(() => result.current.clearCheckedItems());
+      expect(result.current.checkedItems).toEqual([]);
+    });
+
+    it('is a no-op when checkedItems is already empty', () => {
+      const { result } = renderHook(() => ({
+        checkedItems: useCheckedItems(),
+        clearCheckedItems: useClearCheckedItems(),
+      }));
+
+      act(() => result.current.clearCheckedItems());
+      expect(result.current.checkedItems).toEqual([]);
+    });
+  });
+
+  describe('selectedId and checkedItems are independent', () => {
+    it('toggling checkedItem does not affect selectedId', () => {
       const { result } = renderHook(() => ({
         selectedId: useSelectedId(),
         setSelectedId: useSetSelectedId(),
-        checkedIds: useCheckedIds(),
-        toggleCheckedId: useToggleCheckedId(),
+        checkedItems: useCheckedItems(),
+        toggleCheckedItem: useToggleCheckedItem(),
       }));
 
-      act(() => result.current.setSelectedId(5));
-      act(() => result.current.toggleCheckedId(5));
-      expect(result.current.selectedId).toBe(5);
-      expect(result.current.checkedIds).toEqual([5]);
+      act(() => result.current.setSelectedId(mockCharacter.id));
+      act(() => result.current.toggleCheckedItem(mockCharacter));
+      expect(result.current.selectedId).toBe(mockCharacter.id);
+      expect(result.current.checkedItems).toEqual([mockCharacter]);
     });
   });
 });

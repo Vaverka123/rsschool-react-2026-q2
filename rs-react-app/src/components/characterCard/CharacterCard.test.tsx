@@ -1,18 +1,18 @@
 import React from 'react';
 
-import { act } from '@testing-library/react';
-import { screen } from '@testing-library/react';
+import { act, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
-
-import useCharacterStore from '@/store/characterStore';
 
 import CharacterCard from './CharacterCard';
 
+import useCharacterStore from '@/store/characterStore';
 import { mockCharacter } from '@/test-utils/mocks';
 import { renderWithProviders } from '@/test-utils/renderWithProviders';
 
 beforeEach(() => {
-  act(() => useCharacterStore.setState({ selectedId: null, checkedIds: [] }));
+  act(() =>
+    useCharacterStore.setState({ selectedId: null, checkedItems: [] })
+  );
 });
 
 describe('CharacterCard', () => {
@@ -64,6 +64,19 @@ describe('CharacterCard', () => {
         name: /select rick sanchez/i,
       }) as HTMLInputElement;
       expect(checkbox.checked).toBe(false);
+    });
+
+    it('checkbox is checked when character is in checkedItems', () => {
+      act(() =>
+        useCharacterStore.setState({ checkedItems: [mockCharacter] })
+      );
+      renderWithProviders(
+        React.createElement(CharacterCard, { character: mockCharacter })
+      );
+      const checkbox = screen.getByRole('checkbox', {
+        name: /select rick sanchez/i,
+      }) as HTMLInputElement;
+      expect(checkbox.checked).toBe(true);
     });
   });
 
@@ -128,7 +141,7 @@ describe('CharacterCard', () => {
   });
 
   describe('checkbox interaction', () => {
-    it('checking the checkbox adds the character to checkedIds', async () => {
+    it('checking the checkbox adds the character to checkedItems', async () => {
       renderWithProviders(
         React.createElement(CharacterCard, { character: mockCharacter })
       );
@@ -138,13 +151,14 @@ describe('CharacterCard', () => {
 
       await userEvent.click(checkbox);
 
-      expect(useCharacterStore.getState().checkedIds).toContain(
-        mockCharacter.id
-      );
+      const { checkedItems } = useCharacterStore.getState();
+      expect(checkedItems.some((c) => c.id === mockCharacter.id)).toBe(true);
     });
 
-    it('unchecking the checkbox removes the character from checkedIds', async () => {
-      act(() => useCharacterStore.setState({ checkedIds: [mockCharacter.id] }));
+    it('unchecking the checkbox removes the character from checkedItems', async () => {
+      act(() =>
+        useCharacterStore.setState({ checkedItems: [mockCharacter] })
+      );
       renderWithProviders(
         React.createElement(CharacterCard, { character: mockCharacter })
       );
@@ -154,9 +168,8 @@ describe('CharacterCard', () => {
 
       await userEvent.click(checkbox);
 
-      expect(useCharacterStore.getState().checkedIds).not.toContain(
-        mockCharacter.id
-      );
+      const { checkedItems } = useCharacterStore.getState();
+      expect(checkedItems.some((c) => c.id === mockCharacter.id)).toBe(false);
     });
 
     it('checking the checkbox does not open the detail panel', async () => {
@@ -184,14 +197,14 @@ describe('CharacterCard', () => {
       expect(useCharacterStore.getState().selectedId).toBe(mockCharacter.id);
     });
 
-    it('clicking the card body does not affect checkedIds', async () => {
+    it('clicking the card body does not affect checkedItems', async () => {
       renderWithProviders(
         React.createElement(CharacterCard, { character: mockCharacter })
       );
 
       await userEvent.click(screen.getByText('Rick Sanchez'));
 
-      expect(useCharacterStore.getState().checkedIds).toEqual([]);
+      expect(useCharacterStore.getState().checkedItems).toEqual([]);
     });
   });
 });

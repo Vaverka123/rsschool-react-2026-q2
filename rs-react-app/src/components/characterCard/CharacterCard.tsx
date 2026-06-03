@@ -1,9 +1,10 @@
 import {
-  useCheckedIds,
+  useCheckedItems,
   useSelectedId,
   useSetSelectedId,
-  useToggleCheckedId,
+  useToggleCheckedItem,
 } from '@/store/characterStore';
+
 import type { Character, CharacterCardProps } from '@/types/character';
 
 const statusColor: Record<Character['status'], string> = {
@@ -15,11 +16,11 @@ const statusColor: Record<Character['status'], string> = {
 function CharacterCard({ character }: CharacterCardProps) {
   const selectedId = useSelectedId();
   const setSelectedId = useSetSelectedId();
-  const checkedIds = useCheckedIds();
-  const toggleCheckedId = useToggleCheckedId();
+  const checkedItems = useCheckedItems();
+  const toggleCheckedItem = useToggleCheckedItem();
 
   const isSelected = selectedId === character.id;
-  const isChecked = checkedIds.includes(character.id);
+  const isChecked = checkedItems.some((c) => c.id === character.id);
 
   const handleClick = (e: React.MouseEvent<HTMLLIElement>) => {
     e.stopPropagation();
@@ -28,7 +29,7 @@ function CharacterCard({ character }: CharacterCardProps) {
 
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     e.stopPropagation();
-    toggleCheckedId(character.id);
+    toggleCheckedItem(character);
   };
 
   return (
