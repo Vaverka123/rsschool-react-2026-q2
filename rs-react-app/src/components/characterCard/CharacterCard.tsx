@@ -1,5 +1,9 @@
-import { useSelectedId, useSetSelectedId } from '@/store/characterStore';
-
+import {
+  useCheckedIds,
+  useSelectedId,
+  useSetSelectedId,
+  useToggleCheckedId,
+} from '@/store/characterStore';
 import type { Character, CharacterCardProps } from '@/types/character';
 
 const statusColor: Record<Character['status'], string> = {
@@ -11,12 +15,20 @@ const statusColor: Record<Character['status'], string> = {
 function CharacterCard({ character }: CharacterCardProps) {
   const selectedId = useSelectedId();
   const setSelectedId = useSetSelectedId();
+  const checkedIds = useCheckedIds();
+  const toggleCheckedId = useToggleCheckedId();
 
   const isSelected = selectedId === character.id;
+  const isChecked = checkedIds.includes(character.id);
 
   const handleClick = (e: React.MouseEvent<HTMLLIElement>) => {
     e.stopPropagation();
     setSelectedId(character.id);
+  };
+
+  const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    e.stopPropagation();
+    toggleCheckedId(character.id);
   };
 
   return (
@@ -30,7 +42,15 @@ function CharacterCard({ character }: CharacterCardProps) {
       }}
       className="flex flex-col rounded-2xl overflow-hidden hover:scale-[1.02] transition-transform"
     >
-      <div className="p-3 pb-0">
+      <div className="p-3 pb-0 relative">
+        <input
+          type="checkbox"
+          checked={isChecked}
+          onChange={handleCheckboxChange}
+          onClick={(e) => e.stopPropagation()}
+          aria-label={`Select ${character.name}`}
+          className="absolute top-2 left-2 z-10 w-4 h-4 cursor-pointer accent-[var(--accent)]"
+        />
         <img
           src={character.image}
           alt={character.name}

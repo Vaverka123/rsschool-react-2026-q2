@@ -1,5 +1,6 @@
-import { ApiError } from '@/api/rickAndMortyApi';
 import useCharacterDetailQuery from '@/hooks/useCharacterDetailQuery';
+
+import { ApiError } from '@/api/rickAndMortyApi';
 
 function useCharacterDetail(id: number | null) {
   const { data, isLoading, isError, error } = useCharacterDetailQuery(id);

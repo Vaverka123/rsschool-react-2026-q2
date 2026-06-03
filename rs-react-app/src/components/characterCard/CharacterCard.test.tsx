@@ -1,11 +1,19 @@
 import React from 'react';
 
+import { act } from '@testing-library/react';
 import { screen } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+
+import useCharacterStore from '@/store/characterStore';
 
 import CharacterCard from './CharacterCard';
 
 import { mockCharacter } from '@/test-utils/mocks';
 import { renderWithProviders } from '@/test-utils/renderWithProviders';
+
+beforeEach(() => {
+  act(() => useCharacterStore.setState({ selectedId: null, checkedIds: [] }));
+});
 
 describe('CharacterCard', () => {
   describe('rendering', () => {
@@ -37,6 +45,25 @@ describe('CharacterCard', () => {
       const img = screen.getByAltText('Rick Sanchez') as HTMLImageElement;
       expect(img).toBeInTheDocument();
       expect(img.src).toBe(mockCharacter.image);
+    });
+
+    it('renders a checkbox for selection', () => {
+      renderWithProviders(
+        React.createElement(CharacterCard, { character: mockCharacter })
+      );
+      expect(
+        screen.getByRole('checkbox', { name: /select rick sanchez/i })
+      ).toBeInTheDocument();
+    });
+
+    it('checkbox is unchecked by default', () => {
+      renderWithProviders(
+        React.createElement(CharacterCard, { character: mockCharacter })
+      );
+      const checkbox = screen.getByRole('checkbox', {
+        name: /select rick sanchez/i,
+      }) as HTMLInputElement;
+      expect(checkbox.checked).toBe(false);
     });
   });
 
@@ -97,6 +124,74 @@ describe('CharacterCard', () => {
         })
       );
       expect(screen.getByText('Earth (C-137)')).toBeInTheDocument();
+    });
+  });
+
+  describe('checkbox interaction', () => {
+    it('checking the checkbox adds the character to checkedIds', async () => {
+      renderWithProviders(
+        React.createElement(CharacterCard, { character: mockCharacter })
+      );
+      const checkbox = screen.getByRole('checkbox', {
+        name: /select rick sanchez/i,
+      });
+
+      await userEvent.click(checkbox);
+
+      expect(useCharacterStore.getState().checkedIds).toContain(
+        mockCharacter.id
+      );
+    });
+
+    it('unchecking the checkbox removes the character from checkedIds', async () => {
+      act(() => useCharacterStore.setState({ checkedIds: [mockCharacter.id] }));
+      renderWithProviders(
+        React.createElement(CharacterCard, { character: mockCharacter })
+      );
+      const checkbox = screen.getByRole('checkbox', {
+        name: /select rick sanchez/i,
+      });
+
+      await userEvent.click(checkbox);
+
+      expect(useCharacterStore.getState().checkedIds).not.toContain(
+        mockCharacter.id
+      );
+    });
+
+    it('checking the checkbox does not open the detail panel', async () => {
+      renderWithProviders(
+        React.createElement(CharacterCard, { character: mockCharacter })
+      );
+      const checkbox = screen.getByRole('checkbox', {
+        name: /select rick sanchez/i,
+      });
+
+      await userEvent.click(checkbox);
+
+      expect(useCharacterStore.getState().selectedId).toBeNull();
+    });
+  });
+
+  describe('card click interaction', () => {
+    it('clicking the card body opens the detail panel', async () => {
+      renderWithProviders(
+        React.createElement(CharacterCard, { character: mockCharacter })
+      );
+
+      await userEvent.click(screen.getByText('Rick Sanchez'));
+
+      expect(useCharacterStore.getState().selectedId).toBe(mockCharacter.id);
+    });
+
+    it('clicking the card body does not affect checkedIds', async () => {
+      renderWithProviders(
+        React.createElement(CharacterCard, { character: mockCharacter })
+      );
+
+      await userEvent.click(screen.getByText('Rick Sanchez'));
+
+      expect(useCharacterStore.getState().checkedIds).toEqual([]);
     });
   });
 });

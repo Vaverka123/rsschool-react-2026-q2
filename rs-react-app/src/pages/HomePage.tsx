@@ -1,11 +1,14 @@
-import { Link, Outlet, useNavigate, useSearchParams } from 'react-router-dom';
+import { Link, Outlet } from 'react-router-dom';
 
 import ErrorTrigger from '@/components/errorBoundary/ErrorTrigger';
 import Pagination from '@/components/pagination/Pagination';
 import SearchBar from '@/components/searchBar/SearchBar';
 import SearchResults from '@/components/searchResults/SearchResults';
+import SelectedItemsPanel from '@/components/selectedItems/SelectedItemsPanel';
 
 import useSearch from '@/hooks/useSearch';
+
+import { useSelectedId, useSetSelectedId } from '@/store/characterStore';
 
 function HomePage() {
   const {
@@ -20,15 +23,13 @@ function HomePage() {
     handlePageChange,
   } = useSearch();
 
-  const [searchParams] = useSearchParams();
-  const navigate = useNavigate();
-  const hasDetails = searchParams.get('details') !== null;
+  const selectedId = useSelectedId();
+  const setSelectedId = useSetSelectedId();
+  const hasDetails = selectedId !== null;
 
   const handleMainClick = () => {
     if (!hasDetails) return;
-    const params = new URLSearchParams(searchParams);
-    params.delete('details');
-    navigate(`?${params.toString()}`);
+    setSelectedId(null);
   };
 
   return (
@@ -71,6 +72,8 @@ function HomePage() {
           </div>
         )}
       </div>
+
+      <SelectedItemsPanel />
     </div>
   );
 }
