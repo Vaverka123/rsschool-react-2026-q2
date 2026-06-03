@@ -1,6 +1,7 @@
 import { type ReactNode, useState } from 'react';
 import { MemoryRouter } from 'react-router-dom';
 
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, renderHook, waitFor } from '@testing-library/react';
 
 import useSearch from './useSearch';
@@ -27,9 +28,16 @@ vi.mock('@/hooks/useLocalStorage', () => ({
   }),
 }));
 
-const wrapper = ({ children }: { children: ReactNode }) => (
-  <MemoryRouter>{children}</MemoryRouter>
-);
+const createWrapper = () => {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false, gcTime: 0 } },
+  });
+  return ({ children }: { children: ReactNode }) => (
+    <QueryClientProvider client={queryClient}>
+      <MemoryRouter>{children}</MemoryRouter>
+    </QueryClientProvider>
+  );
+};
 
 beforeEach(() => {
   vi.clearAllMocks();
@@ -40,14 +48,16 @@ describe('useSearch', () => {
   describe('initial load', () => {
     it('starts with empty results and not loading', () => {
       vi.mocked(fetchCharacters).mockResolvedValueOnce(mockApiResponse);
-      const { result } = renderHook(() => useSearch(), { wrapper });
+      const { result } = renderHook(() => useSearch(), {
+        wrapper: createWrapper(),
+      });
       expect(result.current.results).toEqual([]);
       expect(result.current.error).toBeNull();
     });
 
     it('fetches on mount with empty query', async () => {
       vi.mocked(fetchCharacters).mockResolvedValueOnce(mockApiResponse);
-      renderHook(() => useSearch(), { wrapper });
+      renderHook(() => useSearch(), { wrapper: createWrapper() });
       await waitFor(() => {
         expect(fetchCharacters).toHaveBeenCalledWith('', 1);
       });
@@ -55,8 +65,8 @@ describe('useSearch', () => {
 
     it('fetches on mount with saved localStorage query', async () => {
       localStorage.setItem('search-query', JSON.stringify('Rick'));
-      vi.mocked(fetchCharacters).mockResolvedValueOnce(mockApiResponse);
-      renderHook(() => useSearch(), { wrapper });
+      vi.mocked(fetchCharacters).mockResolvedValue(mockApiResponse);
+      renderHook(() => useSearch(), { wrapper: createWrapper() });
       await waitFor(() => {
         expect(fetchCharacters).toHaveBeenCalledWith('Rick', 1);
       });
@@ -64,7 +74,9 @@ describe('useSearch', () => {
 
     it('sets results after successful fetch', async () => {
       vi.mocked(fetchCharacters).mockResolvedValueOnce(mockApiResponse);
-      const { result } = renderHook(() => useSearch(), { wrapper });
+      const { result } = renderHook(() => useSearch(), {
+        wrapper: createWrapper(),
+      });
       await waitFor(() => {
         expect(result.current.results).toEqual(mockApiResponse.results);
       });
@@ -72,7 +84,9 @@ describe('useSearch', () => {
 
     it('sets loading to false after fetch completes', async () => {
       vi.mocked(fetchCharacters).mockResolvedValueOnce(mockApiResponse);
-      const { result } = renderHook(() => useSearch(), { wrapper });
+      const { result } = renderHook(() => useSearch(), {
+        wrapper: createWrapper(),
+      });
       await waitFor(() => {
         expect(result.current.loading).toBe(false);
       });
@@ -82,7 +96,9 @@ describe('useSearch', () => {
   describe('handleSearch', () => {
     it('fetches with current query on handleSearch', async () => {
       vi.mocked(fetchCharacters).mockResolvedValue(mockApiResponse);
-      const { result } = renderHook(() => useSearch(), { wrapper });
+      const { result } = renderHook(() => useSearch(), {
+        wrapper: createWrapper(),
+      });
 
       await waitFor(() => expect(fetchCharacters).toHaveBeenCalledTimes(1));
 
@@ -94,7 +110,9 @@ describe('useSearch', () => {
 
     it('fetches again after handleSearch resets lastSearched', async () => {
       vi.mocked(fetchCharacters).mockResolvedValue(mockApiResponse);
-      const { result } = renderHook(() => useSearch(), { wrapper });
+      const { result } = renderHook(() => useSearch(), {
+        wrapper: createWrapper(),
+      });
 
       await waitFor(() => expect(fetchCharacters).toHaveBeenCalledTimes(1));
 
@@ -111,7 +129,9 @@ describe('useSearch', () => {
       vi.mocked(fetchCharacters).mockRejectedValueOnce(
         new ApiError(404, 'No characters found for your search.')
       );
-      const { result } = renderHook(() => useSearch(), { wrapper });
+      const { result } = renderHook(() => useSearch(), {
+        wrapper: createWrapper(),
+      });
       await waitFor(() => {
         expect(result.current.error).toBe(
           'No characters found for your search.'
@@ -121,7 +141,9 @@ describe('useSearch', () => {
 
     it('sets generic error on unknown error', async () => {
       vi.mocked(fetchCharacters).mockRejectedValueOnce(new Error('Unknown'));
-      const { result } = renderHook(() => useSearch(), { wrapper });
+      const { result } = renderHook(() => useSearch(), {
+        wrapper: createWrapper(),
+      });
       await waitFor(() => {
         expect(result.current.error).toBe(
           'Something went wrong. Please try again.'
@@ -133,7 +155,9 @@ describe('useSearch', () => {
       vi.mocked(fetchCharacters).mockRejectedValueOnce(
         new ApiError(404, 'No characters found.')
       );
-      const { result } = renderHook(() => useSearch(), { wrapper });
+      const { result } = renderHook(() => useSearch(), {
+        wrapper: createWrapper(),
+      });
       await waitFor(() => {
         expect(result.current.results).toEqual([]);
       });

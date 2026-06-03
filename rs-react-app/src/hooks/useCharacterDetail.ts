@@ -1,3 +1,4 @@
+import { ApiError } from '@/api/rickAndMortyApi';
 import useCharacterDetailQuery from '@/hooks/useCharacterDetailQuery';
 
 function useCharacterDetail(id: number | null) {
@@ -6,7 +7,11 @@ function useCharacterDetail(id: number | null) {
   return {
     character: data ?? null,
     loading: isLoading && id !== null,
-    error: isError ? (error as Error).message : null,
+    error: isError
+      ? error instanceof ApiError
+        ? (error as Error).message
+        : 'Something went wrong.'
+      : null,
   };
 }
 

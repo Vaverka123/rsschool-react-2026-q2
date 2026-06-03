@@ -1,8 +1,11 @@
+import type { ReactNode } from 'react';
+
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { renderHook, waitFor } from '@testing-library/react';
 
-import useCharacterDetail from './useCharacterDetail';
-
 import { ApiError, fetchCharacter } from '@/api/rickAndMortyApi';
+
+import useCharacterDetail from './useCharacterDetail';
 
 const mockCharacterDetail = {
   id: 1,
@@ -29,26 +32,38 @@ vi.mock('@/api/rickAndMortyApi', () => ({
   },
 }));
 
+const createWrapper = () => {
+  const queryClient = new QueryClient({
+    defaultOptions: { queries: { retry: false, gcTime: 0 } },
+  });
+  return ({ children }: { children: ReactNode }) =>
+    QueryClientProvider({ client: queryClient, children });
+};
+
 beforeEach(() => vi.clearAllMocks());
 
 describe('useCharacterDetail', () => {
   describe('null id', () => {
     it('returns null character when id is null', async () => {
-      const { result } = renderHook(() => useCharacterDetail(null));
+      const { result } = renderHook(() => useCharacterDetail(null), {
+        wrapper: createWrapper(),
+      });
       await waitFor(() => {
         expect(result.current.character).toBeNull();
       });
     });
 
     it('does not fetch when id is null', async () => {
-      renderHook(() => useCharacterDetail(null));
+      renderHook(() => useCharacterDetail(null), { wrapper: createWrapper() });
       await waitFor(() => {
         expect(fetchCharacter).not.toHaveBeenCalled();
       });
     });
 
     it('returns loading false when id is null', async () => {
-      const { result } = renderHook(() => useCharacterDetail(null));
+      const { result } = renderHook(() => useCharacterDetail(null), {
+        wrapper: createWrapper(),
+      });
       await waitFor(() => {
         expect(result.current.loading).toBe(false);
       });
@@ -58,7 +73,7 @@ describe('useCharacterDetail', () => {
   describe('successful fetch', () => {
     it('fetches character by id', async () => {
       vi.mocked(fetchCharacter).mockResolvedValueOnce(mockCharacterDetail);
-      renderHook(() => useCharacterDetail(1));
+      renderHook(() => useCharacterDetail(1), { wrapper: createWrapper() });
       await waitFor(() => {
         expect(fetchCharacter).toHaveBeenCalledWith(1);
       });
@@ -66,7 +81,9 @@ describe('useCharacterDetail', () => {
 
     it('sets character after successful fetch', async () => {
       vi.mocked(fetchCharacter).mockResolvedValueOnce(mockCharacterDetail);
-      const { result } = renderHook(() => useCharacterDetail(1));
+      const { result } = renderHook(() => useCharacterDetail(1), {
+        wrapper: createWrapper(),
+      });
       await waitFor(() => {
         expect(result.current.character).toEqual(mockCharacterDetail);
       });
@@ -74,7 +91,9 @@ describe('useCharacterDetail', () => {
 
     it('sets loading to false after fetch', async () => {
       vi.mocked(fetchCharacter).mockResolvedValueOnce(mockCharacterDetail);
-      const { result } = renderHook(() => useCharacterDetail(1));
+      const { result } = renderHook(() => useCharacterDetail(1), {
+        wrapper: createWrapper(),
+      });
       await waitFor(() => {
         expect(result.current.loading).toBe(false);
       });
@@ -82,7 +101,9 @@ describe('useCharacterDetail', () => {
 
     it('has no error after successful fetch', async () => {
       vi.mocked(fetchCharacter).mockResolvedValueOnce(mockCharacterDetail);
-      const { result } = renderHook(() => useCharacterDetail(1));
+      const { result } = renderHook(() => useCharacterDetail(1), {
+        wrapper: createWrapper(),
+      });
       await waitFor(() => {
         expect(result.current.error).toBeNull();
       });
@@ -94,7 +115,9 @@ describe('useCharacterDetail', () => {
       vi.mocked(fetchCharacter).mockRejectedValueOnce(
         new ApiError(404, 'No characters found for your search.')
       );
-      const { result } = renderHook(() => useCharacterDetail(1));
+      const { result } = renderHook(() => useCharacterDetail(1), {
+        wrapper: createWrapper(),
+      });
       await waitFor(() => {
         expect(result.current.error).toBe(
           'No characters found for your search.'
@@ -104,7 +127,9 @@ describe('useCharacterDetail', () => {
 
     it('sets generic error on unknown error', async () => {
       vi.mocked(fetchCharacter).mockRejectedValueOnce(new Error('Unknown'));
-      const { result } = renderHook(() => useCharacterDetail(1));
+      const { result } = renderHook(() => useCharacterDetail(1), {
+        wrapper: createWrapper(),
+      });
       await waitFor(() => {
         expect(result.current.error).toBe('Something went wrong.');
       });
@@ -114,7 +139,9 @@ describe('useCharacterDetail', () => {
       vi.mocked(fetchCharacter).mockRejectedValueOnce(
         new ApiError(404, 'Not found.')
       );
-      const { result } = renderHook(() => useCharacterDetail(1));
+      const { result } = renderHook(() => useCharacterDetail(1), {
+        wrapper: createWrapper(),
+      });
       await waitFor(() => {
         expect(result.current.character).toBeNull();
       });
@@ -122,7 +149,9 @@ describe('useCharacterDetail', () => {
 
     it('sets loading to false after error', async () => {
       vi.mocked(fetchCharacter).mockRejectedValueOnce(new Error('fail'));
-      const { result } = renderHook(() => useCharacterDetail(1));
+      const { result } = renderHook(() => useCharacterDetail(1), {
+        wrapper: createWrapper(),
+      });
       await waitFor(() => {
         expect(result.current.loading).toBe(false);
       });
@@ -134,6 +163,7 @@ describe('useCharacterDetail', () => {
       vi.mocked(fetchCharacter).mockResolvedValue(mockCharacterDetail);
       const { rerender } = renderHook(({ id }) => useCharacterDetail(id), {
         initialProps: { id: 1 as number | null },
+        wrapper: createWrapper(),
       });
       await waitFor(() => expect(fetchCharacter).toHaveBeenCalledWith(1));
 
@@ -145,7 +175,7 @@ describe('useCharacterDetail', () => {
       vi.mocked(fetchCharacter).mockResolvedValueOnce(mockCharacterDetail);
       const { result, rerender } = renderHook(
         ({ id }) => useCharacterDetail(id),
-        { initialProps: { id: 1 as number | null } }
+        { initialProps: { id: 1 as number | null }, wrapper: createWrapper() }
       );
       await waitFor(() =>
         expect(result.current.character).toEqual(mockCharacterDetail)
