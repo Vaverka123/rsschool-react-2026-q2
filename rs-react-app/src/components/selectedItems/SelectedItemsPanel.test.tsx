@@ -67,9 +67,16 @@ describe('SelectedItemsPanel', () => {
     let createObjectURL: ReturnType<typeof vi.fn>;
     let revokeObjectURL: ReturnType<typeof vi.fn>;
     let clickSpy: ReturnType<typeof vi.fn>;
+    let anchorEl: HTMLAnchorElement | null;
+    let blobArg: Blob | null;
 
     beforeEach(() => {
-      createObjectURL = vi.fn(() => 'blob:mock-url');
+      anchorEl = null;
+      blobArg = null;
+      createObjectURL = vi.fn((b: Blob) => {
+        blobArg = b;
+        return 'blob:mock-url';
+      });
       revokeObjectURL = vi.fn();
       clickSpy = vi.fn();
 
@@ -80,7 +87,10 @@ describe('SelectedItemsPanel', () => {
       vi.spyOn(document, 'createElement').mockImplementation(
         (tag: string, options?: ElementCreationOptions) => {
           const el = original(tag, options);
-          if (tag === 'a') el.click = clickSpy;
+          if (tag === 'a') {
+            el.click = clickSpy;
+            anchorEl = el as HTMLAnchorElement;
+          }
           return el;
         }
       );
@@ -90,7 +100,7 @@ describe('SelectedItemsPanel', () => {
       vi.restoreAllMocks();
     });
 
-    it('triggers a file download when Download is clicked', async () => {
+    it('triggers a file download using native browser APIs', async () => {
       act(() => useCharacterStore.setState({ checkedItems: [mockCharacter] }));
       renderWithProviders(<SelectedItemsPanel />);
 
@@ -99,6 +109,55 @@ describe('SelectedItemsPanel', () => {
       expect(createObjectURL).toHaveBeenCalledOnce();
       expect(revokeObjectURL).toHaveBeenCalledWith('blob:mock-url');
       expect(clickSpy).toHaveBeenCalledOnce();
+    });
+
+    it('names the file with the number of selected items', async () => {
+      act(() => useCharacterStore.setState({ checkedItems: mockCharacters }));
+      renderWithProviders(<SelectedItemsPanel />);
+
+      await userEvent.click(screen.getByRole('button', { name: /download/i }));
+
+      expect(anchorEl?.download).toBe('3_items.csv');
+    });
+
+    it('names the file with 1 for a single selected item', async () => {
+      act(() => useCharacterStore.setState({ checkedItems: [mockCharacter] }));
+      renderWithProviders(<SelectedItemsPanel />);
+
+      await userEvent.click(screen.getByRole('button', { name: /download/i }));
+
+      expect(anchorEl?.download).toBe('1_items.csv');
+    });
+
+    it('CSV contains required columns in the header', async () => {
+      act(() => useCharacterStore.setState({ checkedItems: [mockCharacter] }));
+      renderWithProviders(<SelectedItemsPanel />);
+
+      await userEvent.click(screen.getByRole('button', { name: /download/i }));
+
+      const text = await blobArg!.text();
+      const header = text.split('\n')[0];
+      expect(header).toContain('name');
+      expect(header).toContain('status');
+      expect(header).toContain('species');
+      expect(header).toContain('location');
+      expect(header).toContain('url');
+    });
+
+    it('CSV row contains character data and details URL', async () => {
+      act(() => useCharacterStore.setState({ checkedItems: [mockCharacter] }));
+      renderWithProviders(<SelectedItemsPanel />);
+
+      await userEvent.click(screen.getByRole('button', { name: /download/i }));
+
+      const text = await blobArg!.text();
+      expect(text).toContain('Rick Sanchez');
+      expect(text).toContain('Alive');
+      expect(text).toContain('Human');
+      expect(text).toContain('Citadel of Ricks');
+      expect(text).toContain(
+        `https://rickandmortyapi.com/api/character/${mockCharacter.id}`
+      );
     });
   });
 });

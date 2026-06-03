@@ -1,17 +1,30 @@
+import type { Character } from '@/types/character';
 import { useClearCheckedItems, useCheckedItems } from '@/store/characterStore';
 
-function downloadCsv(items: ReturnType<typeof useCheckedItems>) {
-  const header = 'id,name,status,species,location';
-  const rows = items.map(
-    (c) =>
-      `${c.id},"${c.name}",${c.status},${c.species},"${c.location.name}"`
+const escCsv = (v: string | number): string => {
+  const s = String(v);
+  return /[,"\n]/.test(s) ? `"${s.replace(/"/g, '""')}"` : s;
+};
+
+function downloadCsv(items: Character[]) {
+  const headers = ['id', 'name', 'status', 'species', 'location', 'image', 'url'];
+  const rows = items.map((c) =>
+    [
+      c.id,
+      escCsv(c.name),
+      c.status,
+      escCsv(c.species),
+      escCsv(c.location.name),
+      c.image,
+      `https://rickandmortyapi.com/api/character/${c.id}`,
+    ].join(',')
   );
-  const csv = [header, ...rows].join('\n');
+  const csv = [headers.join(','), ...rows].join('\n');
   const blob = new Blob([csv], { type: 'text/csv' });
   const url = URL.createObjectURL(blob);
   const a = document.createElement('a');
   a.href = url;
-  a.download = 'selected-characters.csv';
+  a.download = `${items.length}_items.csv`;
   a.click();
   URL.revokeObjectURL(url);
 }
