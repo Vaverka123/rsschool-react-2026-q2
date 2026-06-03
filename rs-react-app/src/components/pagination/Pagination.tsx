@@ -24,6 +24,7 @@ function Pagination({
   return (
     <nav
       aria-label="Pagination"
+      onClick={(event) => event.stopPropagation()}
       className="flex items-center justify-center gap-1 flex-wrap py-4"
     >
       <button

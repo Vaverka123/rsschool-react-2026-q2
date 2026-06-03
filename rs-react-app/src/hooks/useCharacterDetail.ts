@@ -1,56 +1,13 @@
-import { useEffect, useState } from 'react';
-
-import type { CharacterDetail } from '@/types/character';
-
-import { ApiError, fetchCharacter } from '@/api/rickAndMortyApi';
+import useCharacterDetailQuery from '@/hooks/useCharacterDetailQuery';
 
 function useCharacterDetail(id: number | null) {
-  const [character, setCharacter] = useState<CharacterDetail | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const { data, isLoading, isError, error } = useCharacterDetailQuery(id);
 
-  useEffect(() => {
-    if (id === null) {
-      // Avoid synchronous setState inside effect to prevent cascading renders
-      const t = setTimeout(() => setCharacter(null), 0);
-      return () => clearTimeout(t);
-    }
-
-    let isActive = true;
-
-    Promise.resolve().then(() => {
-      if (!isActive) return;
-      setLoading(true);
-      setError(null);
-    });
-
-    fetchCharacter(id)
-      .then((result) => {
-        if (isActive) {
-          setCharacter(result);
-        }
-      })
-      .catch((err) => {
-        if (!isActive) return;
-
-        if (err instanceof ApiError) {
-          setError(err.message);
-        } else {
-          setError('Something went wrong.');
-        }
-      })
-      .finally(() => {
-        if (isActive) {
-          setLoading(false);
-        }
-      });
-
-    return () => {
-      isActive = false;
-    };
-  }, [id]);
-
-  return { character, loading, error };
+  return {
+    character: data ?? null,
+    loading: isLoading && id !== null,
+    error: isError ? (error as Error).message : null,
+  };
 }
 
 export default useCharacterDetail;

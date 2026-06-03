@@ -1,7 +1,9 @@
-import { MemoryRouter, Route, Routes, useSearchParams } from 'react-router-dom';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
 
 import { screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
+
+import useCharacterStore from '@/store/characterStore';
 
 import CharacterDetail from './CharacterDetail';
 
@@ -27,10 +29,12 @@ vi.mock('@/hooks/useCharacterDetail', () => ({
 const { default: useCharacterDetail } =
   await import('@/hooks/useCharacterDetail');
 
-const renderWithDetails = (detailsId?: string) => {
-  const search = detailsId ? `?details=${detailsId}` : '';
+const renderWithDetails = (detailsId?: number) => {
+  if (detailsId != null) {
+    useCharacterStore.setState({ selectedId: detailsId });
+  }
   return renderWithMemoryRouter(
-    <MemoryRouter initialEntries={[`/${search}`]}>
+    <MemoryRouter initialEntries={['/']}>
       <Routes>
         <Route path="/" element={<CharacterDetail />} />
       </Routes>
@@ -38,11 +42,14 @@ const renderWithDetails = (detailsId?: string) => {
   );
 };
 
-beforeEach(() => vi.clearAllMocks());
+beforeEach(() => {
+  vi.clearAllMocks();
+  useCharacterStore.setState({ selectedId: null });
+});
 
 describe('CharacterDetail', () => {
   describe('no selection', () => {
-    it('renders nothing when no details param', () => {
+    it('renders nothing when no selection in store', () => {
       vi.mocked(useCharacterDetail).mockReturnValue({
         character: null,
         loading: false,
@@ -60,7 +67,7 @@ describe('CharacterDetail', () => {
         loading: true,
         error: null,
       });
-      renderWithDetails('1');
+      renderWithDetails(1);
       expect(document.querySelector('.animate-spin')).toBeInTheDocument();
     });
 
@@ -70,7 +77,7 @@ describe('CharacterDetail', () => {
         loading: true,
         error: null,
       });
-      renderWithDetails('1');
+      renderWithDetails(1);
       expect(screen.queryByText('Rick Sanchez')).not.toBeInTheDocument();
     });
   });
@@ -82,7 +89,7 @@ describe('CharacterDetail', () => {
         loading: false,
         error: 'No characters found for your search.',
       });
-      renderWithDetails('999');
+      renderWithDetails(999);
       expect(
         screen.getByText('No characters found for your search.')
       ).toBeInTheDocument();
@@ -94,7 +101,7 @@ describe('CharacterDetail', () => {
         loading: false,
         error: 'Something went wrong.',
       });
-      renderWithDetails('999');
+      renderWithDetails(999);
       expect(
         screen.getByRole('button', { name: /close/i })
       ).toBeInTheDocument();
@@ -111,54 +118,54 @@ describe('CharacterDetail', () => {
     });
 
     it('renders character name', () => {
-      renderWithDetails('1');
+      renderWithDetails(1);
       expect(screen.getByText('Rick Sanchez')).toBeInTheDocument();
     });
 
     it('renders character image', () => {
-      renderWithDetails('1');
+      renderWithDetails(1);
       const img = screen.getByAltText('Rick Sanchez') as HTMLImageElement;
       expect(img).toBeInTheDocument();
       expect(img.src).toBe(mockCharacterDetail.image);
     });
 
     it('renders status', () => {
-      renderWithDetails('1');
+      renderWithDetails(1);
       expect(screen.getByText('Alive')).toBeInTheDocument();
     });
 
     it('renders species', () => {
-      renderWithDetails('1');
+      renderWithDetails(1);
       expect(screen.getByText('Human')).toBeInTheDocument();
     });
 
     it('renders gender', () => {
-      renderWithDetails('1');
+      renderWithDetails(1);
       expect(screen.getByText('Male')).toBeInTheDocument();
     });
 
     it('renders origin', () => {
-      renderWithDetails('1');
+      renderWithDetails(1);
       expect(screen.getByText('Earth (C-137)')).toBeInTheDocument();
     });
 
     it('renders location', () => {
-      renderWithDetails('1');
+      renderWithDetails(1);
       expect(screen.getByText('Citadel of Ricks')).toBeInTheDocument();
     });
 
     it('renders episode count', () => {
-      renderWithDetails('1');
+      renderWithDetails(1);
       expect(screen.getByText('3')).toBeInTheDocument();
     });
 
     it('renders Unknown for empty type', () => {
-      renderWithDetails('1');
+      renderWithDetails(1);
       expect(screen.getByText('Unknown')).toBeInTheDocument();
     });
 
     it('renders close button', () => {
-      renderWithDetails('1');
+      renderWithDetails(1);
       expect(
         screen.getByRole('button', { name: /close details/i })
       ).toBeInTheDocument();
@@ -174,7 +181,7 @@ describe('CharacterDetail', () => {
       });
     });
 
-    it('removes details param from URL on close click', async () => {
+    it('resets selectedId in store on close click', async () => {
       vi.mocked(useCharacterDetail)
         .mockReturnValueOnce({
           character: mockCharacterDetail,
@@ -183,35 +190,15 @@ describe('CharacterDetail', () => {
         })
         .mockReturnValue({ character: null, loading: false, error: null });
 
-      const LocationDisplay = () => {
-        const [searchParams] = useSearchParams();
-        return <span data-testid="search">{searchParams.toString()}</span>;
-      };
-
-      renderWithMemoryRouter(
-        <MemoryRouter initialEntries={['/?details=1']}>
-          <Routes>
-            <Route
-              path="/"
-              element={
-                <>
-                  <CharacterDetail />
-                  <LocationDisplay />
-                </>
-              }
-            />
-          </Routes>
-        </MemoryRouter>
-      );
-
-      expect(screen.getByTestId('search').textContent).toBe('details=1');
+      renderWithDetails(1);
+      expect(useCharacterStore.getState().selectedId).toBe(1);
 
       await userEvent.click(
         screen.getByRole('button', { name: /close details/i })
       );
 
       await waitFor(() => {
-        expect(screen.getByTestId('search').textContent).toBe('');
+        expect(useCharacterStore.getState().selectedId).toBeNull();
       });
     });
   });
