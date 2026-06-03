@@ -5,6 +5,7 @@ import Pagination from '@/components/pagination/Pagination';
 import SearchBar from '@/components/searchBar/SearchBar';
 import SearchResults from '@/components/searchResults/SearchResults';
 import SelectedItemsPanel from '@/components/selectedItems/SelectedItemsPanel';
+import ThemeToggle from '@/components/themeToggle/ThemeToggle';
 
 import useSearch from '@/hooks/useSearch';
 
@@ -40,13 +41,16 @@ function HomePage() {
 
   return (
     <div className={`flex flex-col gap-8 px-6 py-8 ${hasFlyout ? 'pb-24' : ''}`}>
-      <Link
-        to="/about"
-        style={{ color: 'var(--accent)' }}
-        className="p-4 border-2 border-accent rounded-2xl text-lg  hover:opacity-70 transition-opacity"
-      >
-        About
-      </Link>
+      <div className="flex items-center justify-between">
+        <Link
+          to="/about"
+          style={{ color: 'var(--accent)' }}
+          className="p-4 border-2 border-accent rounded-2xl text-lg hover:opacity-70 transition-opacity"
+        >
+          About
+        </Link>
+        <ThemeToggle />
+      </div>
       <div className="flex flex-col gap-2">
         <h1 style={{ color: 'var(--accent)' }}>Rick & Morty</h1>
         <p style={{ color: 'var(--text)' }} className="text-sm">

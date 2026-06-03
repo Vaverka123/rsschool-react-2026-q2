@@ -3,6 +3,8 @@ import { BrowserRouter } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { render, type RenderOptions } from '@testing-library/react';
 
+import ThemeProvider from '@/context/ThemeProvider';
+
 function makeQueryClient() {
   return new QueryClient({
     defaultOptions: {
@@ -17,9 +19,11 @@ function makeQueryClient() {
 // eslint-disable-next-line react-refresh/only-export-components
 function Providers({ children }: { children: React.ReactNode }) {
   return (
-    <QueryClientProvider client={makeQueryClient()}>
-      <BrowserRouter>{children}</BrowserRouter>
-    </QueryClientProvider>
+    <ThemeProvider>
+      <QueryClientProvider client={makeQueryClient()}>
+        <BrowserRouter>{children}</BrowserRouter>
+      </QueryClientProvider>
+    </ThemeProvider>
   );
 }
 
