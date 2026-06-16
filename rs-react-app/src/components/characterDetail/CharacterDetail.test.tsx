@@ -1,13 +1,9 @@
-import { MemoryRouter, Route, Routes } from 'react-router-dom';
+import { MemoryRouter, Route, Routes, useSearchParams } from 'react-router-dom';
 
-import { screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 
-import useCharacterStore from '@/store/characterStore';
-
 import CharacterDetail from './CharacterDetail';
-
-import { renderWithMemoryRouter } from '@/test-utils/renderWithProviders';
 
 const mockCharacterDetail = {
   id: 1,
@@ -29,14 +25,25 @@ vi.mock('@/hooks/useCharacterDetail', () => ({
 const { default: useCharacterDetail } =
   await import('@/hooks/useCharacterDetail');
 
+const LocationDisplay = () => {
+  const [searchParams] = useSearchParams();
+  return <span data-testid="search">{searchParams.toString()}</span>;
+};
+
 const renderWithDetails = (detailsId?: number) => {
-  if (detailsId != null) {
-    useCharacterStore.setState({ selectedId: detailsId });
-  }
-  return renderWithMemoryRouter(
-    <MemoryRouter initialEntries={['/']}>
+  const initialEntry = detailsId != null ? `/?details=${detailsId}` : '/';
+  return render(
+    <MemoryRouter initialEntries={[initialEntry]}>
       <Routes>
-        <Route path="/" element={<CharacterDetail />} />
+        <Route
+          path="/"
+          element={
+            <>
+              <CharacterDetail />
+              <LocationDisplay />
+            </>
+          }
+        />
       </Routes>
     </MemoryRouter>
   );
@@ -44,19 +51,18 @@ const renderWithDetails = (detailsId?: number) => {
 
 beforeEach(() => {
   vi.clearAllMocks();
-  useCharacterStore.setState({ selectedId: null });
 });
 
 describe('CharacterDetail', () => {
   describe('no selection', () => {
-    it('renders nothing when no selection in store', () => {
+    it('renders nothing when no details param in URL', () => {
       vi.mocked(useCharacterDetail).mockReturnValue({
         character: null,
         loading: false,
         error: null,
       });
       const { container } = renderWithDetails();
-      expect(container).toBeEmptyDOMElement();
+      expect(container.querySelector('[aria-label]')).toBeNull();
     });
   });
 
@@ -173,15 +179,7 @@ describe('CharacterDetail', () => {
   });
 
   describe('close behaviour', () => {
-    beforeEach(() => {
-      vi.mocked(useCharacterDetail).mockReturnValue({
-        character: mockCharacterDetail,
-        loading: false,
-        error: null,
-      });
-    });
-
-    it('resets selectedId in store on close click', async () => {
+    it('removes details param from URL on close click', async () => {
       vi.mocked(useCharacterDetail)
         .mockReturnValueOnce({
           character: mockCharacterDetail,
@@ -191,14 +189,14 @@ describe('CharacterDetail', () => {
         .mockReturnValue({ character: null, loading: false, error: null });
 
       renderWithDetails(1);
-      expect(useCharacterStore.getState().selectedId).toBe(1);
+      expect(screen.getByTestId('search').textContent).toContain('details=1');
 
       await userEvent.click(
         screen.getByRole('button', { name: /close details/i })
       );
 
       await waitFor(() => {
-        expect(useCharacterStore.getState().selectedId).toBeNull();
+        expect(screen.getByTestId('search').textContent).not.toContain('details');
       });
     });
   });

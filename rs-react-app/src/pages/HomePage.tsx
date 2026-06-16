@@ -1,4 +1,4 @@
-import { Link, Outlet } from 'react-router-dom';
+import { Link, Outlet, useSearchParams } from 'react-router-dom';
 
 import ErrorTrigger from '@/components/errorBoundary/ErrorTrigger';
 import Pagination from '@/components/pagination/Pagination';
@@ -9,11 +9,7 @@ import ThemeToggle from '@/components/themeToggle/ThemeToggle';
 
 import useSearch from '@/hooks/useSearch';
 
-import {
-  useCheckedItems,
-  useSelectedId,
-  useSetSelectedId,
-} from '@/store/characterStore';
+import { useCheckedItems } from '@/store/characterStore';
 
 function HomePage() {
   const {
@@ -28,15 +24,17 @@ function HomePage() {
     handlePageChange,
   } = useSearch();
 
-  const selectedId = useSelectedId();
-  const setSelectedId = useSetSelectedId();
+  const [searchParams, setSearchParams] = useSearchParams();
   const checkedItems = useCheckedItems();
-  const hasDetails = selectedId !== null;
+  const hasDetails = searchParams.has('details');
   const hasFlyout = checkedItems.length > 0;
 
   const handleMainClick = () => {
     if (!hasDetails) return;
-    setSelectedId(null);
+    setSearchParams((prev) => {
+      prev.delete('details');
+      return prev;
+    });
   };
 
   return (

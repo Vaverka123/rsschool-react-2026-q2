@@ -10,9 +10,11 @@ import { mockCharacter } from '@/test-utils/mocks';
 import { renderWithProviders } from '@/test-utils/renderWithProviders';
 
 beforeEach(() => {
-  act(() =>
-    useCharacterStore.setState({ selectedId: null, checkedItems: [] })
-  );
+  act(() => useCharacterStore.setState({ checkedItems: [] }));
+});
+
+afterEach(() => {
+  window.history.replaceState({}, '', '/');
 });
 
 describe('CharacterCard', () => {
@@ -172,7 +174,7 @@ describe('CharacterCard', () => {
       expect(checkedItems.some((c) => c.id === mockCharacter.id)).toBe(false);
     });
 
-    it('checking the checkbox does not open the detail panel', async () => {
+    it('checking the checkbox does not add details param to URL', async () => {
       renderWithProviders(
         React.createElement(CharacterCard, { character: mockCharacter })
       );
@@ -182,19 +184,21 @@ describe('CharacterCard', () => {
 
       await userEvent.click(checkbox);
 
-      expect(useCharacterStore.getState().selectedId).toBeNull();
+      expect(new URLSearchParams(window.location.search).get('details')).toBeNull();
     });
   });
 
   describe('card click interaction', () => {
-    it('clicking the card body opens the detail panel', async () => {
+    it('clicking the card body adds details param to URL', async () => {
       renderWithProviders(
         React.createElement(CharacterCard, { character: mockCharacter })
       );
 
       await userEvent.click(screen.getByText('Rick Sanchez'));
 
-      expect(useCharacterStore.getState().selectedId).toBe(mockCharacter.id);
+      expect(new URLSearchParams(window.location.search).get('details')).toBe(
+        String(mockCharacter.id)
+      );
     });
 
     it('clicking the card body does not affect checkedItems', async () => {

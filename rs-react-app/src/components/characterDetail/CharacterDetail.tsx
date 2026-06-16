@@ -1,15 +1,18 @@
+import { useSearchParams } from 'react-router-dom';
+
 import useCharacterDetail from '@/hooks/useCharacterDetail';
 
-import { useSelectedId, useSetSelectedId } from '@/store/characterStore';
-
 function CharacterDetail() {
-  const id = useSelectedId();
-  const setSelectedId = useSetSelectedId();
+  const [searchParams, setSearchParams] = useSearchParams();
+  const id = Number(searchParams.get('details')) || null;
 
   const { character, loading, error } = useCharacterDetail(id);
 
   const handleClose = () => {
-    setSelectedId(null);
+    setSearchParams((prev) => {
+      prev.delete('details');
+      return prev;
+    });
   };
 
   if (loading) {
@@ -45,6 +48,7 @@ function CharacterDetail() {
           onClick={handleClose}
           style={{ color: 'var(--accent)' }}
           className="text-sm"
+          aria-label="Close"
         >
           Close
         </button>

@@ -1,9 +1,6 @@
-import {
-  useCheckedItems,
-  useSelectedId,
-  useSetSelectedId,
-  useToggleCheckedItem,
-} from '@/store/characterStore';
+import { useSearchParams } from 'react-router-dom';
+
+import { useCheckedItems, useToggleCheckedItem } from '@/store/characterStore';
 
 import type { Character, CharacterCardProps } from '@/types/character';
 
@@ -14,17 +11,19 @@ const statusColor: Record<Character['status'], string> = {
 };
 
 function CharacterCard({ character }: CharacterCardProps) {
-  const selectedId = useSelectedId();
-  const setSelectedId = useSetSelectedId();
+  const [searchParams, setSearchParams] = useSearchParams();
   const checkedItems = useCheckedItems();
   const toggleCheckedItem = useToggleCheckedItem();
 
-  const isSelected = selectedId === character.id;
+  const isSelected = searchParams.get('details') === String(character.id);
   const isChecked = checkedItems.some((c) => c.id === character.id);
 
   const handleClick = (e: React.MouseEvent<HTMLLIElement>) => {
     e.stopPropagation();
-    setSelectedId(character.id);
+    setSearchParams((prev) => {
+      prev.set('details', String(character.id));
+      return prev;
+    });
   };
 
   const handleCheckboxChange = (e: React.ChangeEvent<HTMLInputElement>) => {
