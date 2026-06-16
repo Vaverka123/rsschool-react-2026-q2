@@ -59,6 +59,15 @@ describe('useCharactersQuery', () => {
     expect(result.current.error).toBeInstanceOf(Error);
   });
 
+  it('sets loading to false after successful fetch', async () => {
+    vi.mocked(fetchCharacters).mockResolvedValueOnce(mockApiResponse);
+    const { result } = renderHook(() => useCharactersQuery('', 1), {
+      wrapper: createWrapper(),
+    });
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+    expect(result.current.isSuccess).toBe(true);
+  });
+
   it('generates correct query keys', () => {
     expect(characterKeys.list('Rick', 1)).toEqual([
       'characters',
@@ -67,5 +76,62 @@ describe('useCharactersQuery', () => {
       1,
     ]);
     expect(characterKeys.detail(42)).toEqual(['characters', 'detail', 42]);
+  });
+
+  describe('caching', () => {
+    const makeCachingWrapper = () => {
+      const queryClient = new QueryClient({
+        defaultOptions: { queries: { retry: false, staleTime: 60_000, gcTime: 60_000 } },
+      });
+      return {
+        queryClient,
+        wrapper: ({ children }: { children: React.ReactNode }) =>
+          React.createElement(QueryClientProvider, { client: queryClient }, children),
+      };
+    };
+
+    it('returns cached data without a second fetch for the same query key', async () => {
+      vi.mocked(fetchCharacters).mockResolvedValue(mockApiResponse);
+      const { wrapper } = makeCachingWrapper();
+
+      const { result: r1, unmount } = renderHook(() => useCharactersQuery('Rick', 1), { wrapper });
+      await waitFor(() => expect(r1.current.isSuccess).toBe(true));
+      expect(fetchCharacters).toHaveBeenCalledTimes(1);
+      unmount();
+
+      const { result: r2 } = renderHook(() => useCharactersQuery('Rick', 1), { wrapper });
+      await waitFor(() => expect(r2.current.isSuccess).toBe(true));
+      expect(fetchCharacters).toHaveBeenCalledTimes(1);
+      expect(r2.current.data?.results).toHaveLength(mockApiResponse.results.length);
+    });
+
+    it('fetches again for a different query key', async () => {
+      vi.mocked(fetchCharacters).mockResolvedValue(mockApiResponse);
+      const { wrapper } = makeCachingWrapper();
+
+      const { result: r1 } = renderHook(() => useCharactersQuery('Rick', 1), { wrapper });
+      await waitFor(() => expect(r1.current.isSuccess).toBe(true));
+      expect(fetchCharacters).toHaveBeenCalledTimes(1);
+
+      const { result: r2 } = renderHook(() => useCharactersQuery('Morty', 1), { wrapper });
+      await waitFor(() => expect(r2.current.isSuccess).toBe(true));
+      expect(fetchCharacters).toHaveBeenCalledTimes(2);
+    });
+
+    it('provides previous page data via placeholderData while fetching the next page', async () => {
+      vi.mocked(fetchCharacters).mockResolvedValue(mockApiResponse);
+      const { wrapper } = makeCachingWrapper();
+
+      const { result, rerender } = renderHook(
+        ({ page }: { page: number }) => useCharactersQuery('', page),
+        { initialProps: { page: 1 }, wrapper }
+      );
+      await waitFor(() => expect(result.current.isSuccess).toBe(true));
+
+      rerender({ page: 2 });
+
+      expect(result.current.data?.results).toHaveLength(mockApiResponse.results.length);
+      expect(result.current.isFetching).toBe(true);
+    });
   });
 });

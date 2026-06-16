@@ -51,6 +51,14 @@ describe('useCharacterDetailQuery', () => {
     expect(result.current.fetchStatus).toBe('idle');
   });
 
+  it('is loading initially when id is provided', () => {
+    vi.mocked(fetchCharacter).mockResolvedValueOnce(mockDetail);
+    const { result } = renderHook(() => useCharacterDetailQuery(1), {
+      wrapper: createWrapper(),
+    });
+    expect(result.current.isLoading).toBe(true);
+  });
+
   it('fetches character when id is provided', async () => {
     vi.mocked(fetchCharacter).mockResolvedValueOnce(mockDetail);
     const { result } = renderHook(() => useCharacterDetailQuery(1), {
@@ -61,11 +69,58 @@ describe('useCharacterDetailQuery', () => {
     expect(result.current.data).toEqual(mockDetail);
   });
 
+  it('sets loading to false after successful fetch', async () => {
+    vi.mocked(fetchCharacter).mockResolvedValueOnce(mockDetail);
+    const { result } = renderHook(() => useCharacterDetailQuery(1), {
+      wrapper: createWrapper(),
+    });
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+  });
+
   it('sets error on failure', async () => {
     vi.mocked(fetchCharacter).mockRejectedValueOnce(new Error('Not found'));
     const { result } = renderHook(() => useCharacterDetailQuery(99), {
       wrapper: createWrapper(),
     });
     await waitFor(() => expect(result.current.isError).toBe(true));
+  });
+
+  describe('caching', () => {
+    const makeCachingWrapper = () => {
+      const queryClient = new QueryClient({
+        defaultOptions: { queries: { retry: false, staleTime: 60_000, gcTime: 60_000 } },
+      });
+      return {
+        wrapper: ({ children }: { children: ReactNode }) =>
+          createElement(QueryClientProvider, { client: queryClient }, children),
+      };
+    };
+
+    it('returns cached data without a second fetch for the same id', async () => {
+      vi.mocked(fetchCharacter).mockResolvedValue(mockDetail);
+      const { wrapper } = makeCachingWrapper();
+
+      const { result: r1, unmount } = renderHook(() => useCharacterDetailQuery(1), { wrapper });
+      await waitFor(() => expect(r1.current.isSuccess).toBe(true));
+      expect(fetchCharacter).toHaveBeenCalledTimes(1);
+      unmount();
+
+      const { result: r2 } = renderHook(() => useCharacterDetailQuery(1), { wrapper });
+      await waitFor(() => expect(r2.current.isSuccess).toBe(true));
+      expect(fetchCharacter).toHaveBeenCalledTimes(1);
+      expect(r2.current.data).toEqual(mockDetail);
+    });
+
+    it('fetches again for a different id', async () => {
+      vi.mocked(fetchCharacter).mockResolvedValue(mockDetail);
+      const { wrapper } = makeCachingWrapper();
+
+      const { result: r1 } = renderHook(() => useCharacterDetailQuery(1), { wrapper });
+      await waitFor(() => expect(r1.current.isSuccess).toBe(true));
+
+      const { result: r2 } = renderHook(() => useCharacterDetailQuery(2), { wrapper });
+      await waitFor(() => expect(r2.current.isSuccess).toBe(true));
+      expect(fetchCharacter).toHaveBeenCalledTimes(2);
+    });
   });
 });

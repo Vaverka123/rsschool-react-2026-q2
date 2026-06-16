@@ -82,6 +82,14 @@ describe('useSearch', () => {
       });
     });
 
+    it('sets loading to true while fetching', () => {
+      vi.mocked(fetchCharacters).mockResolvedValueOnce(mockApiResponse);
+      const { result } = renderHook(() => useSearch(), {
+        wrapper: createWrapper(),
+      });
+      expect(result.current.loading).toBe(true);
+    });
+
     it('sets loading to false after fetch completes', async () => {
       vi.mocked(fetchCharacters).mockResolvedValueOnce(mockApiResponse);
       const { result } = renderHook(() => useSearch(), {
