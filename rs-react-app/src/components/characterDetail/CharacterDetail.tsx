@@ -2,11 +2,13 @@ import { useSearchParams } from 'react-router-dom';
 
 import useCharacterDetail from '@/hooks/useCharacterDetail';
 
+import { RefreshIcon } from '@/assets/refreshIcon';
+
 function CharacterDetail() {
   const [searchParams, setSearchParams] = useSearchParams();
   const id = Number(searchParams.get('details')) || null;
 
-  const { character, loading, error } = useCharacterDetail(id);
+  const { character, loading, error, handleRefresh } = useCharacterDetail(id);
 
   const handleClose = () => {
     setSearchParams((prev) => {
@@ -68,14 +70,24 @@ function CharacterDetail() {
         style={{ borderBottom: '1px solid var(--border)' }}
       >
         <h2 style={{ color: 'var(--text-h)' }}>{character.name}</h2>
-        <button
-          onClick={handleClose}
-          style={{ color: 'var(--text)', border: '1px solid var(--border)' }}
-          className="w-8 h-8 flex items-center justify-center rounded-lg hover:opacity-70 transition-opacity cursor-pointer"
-          aria-label="Close details"
-        >
-          ×
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            onClick={handleRefresh}
+            style={{ color: 'var(--text)', border: '1px solid var(--border)' }}
+            className="w-8 h-8 flex items-center justify-center rounded-lg hover:opacity-70 transition-opacity cursor-pointer"
+            aria-label="Refresh details"
+          >
+            <RefreshIcon size={14} />
+          </button>
+          <button
+            onClick={handleClose}
+            style={{ color: 'var(--text)', border: '1px solid var(--border)' }}
+            className="w-8 h-8 flex items-center justify-center rounded-lg hover:opacity-70 transition-opacity cursor-pointer"
+            aria-label="Close details"
+          >
+            ×
+          </button>
+        </div>
       </div>
 
       <img

@@ -49,6 +49,15 @@ const renderWithDetails = (detailsId?: number) => {
   );
 };
 
+const mockReturn = (overrides: Partial<ReturnType<typeof useCharacterDetail>>) =>
+  vi.mocked(useCharacterDetail).mockReturnValue({
+    character: null,
+    loading: false,
+    error: null,
+    handleRefresh: vi.fn(),
+    ...overrides,
+  });
+
 beforeEach(() => {
   vi.clearAllMocks();
 });
@@ -56,11 +65,7 @@ beforeEach(() => {
 describe('CharacterDetail', () => {
   describe('no selection', () => {
     it('renders nothing when no details param in URL', () => {
-      vi.mocked(useCharacterDetail).mockReturnValue({
-        character: null,
-        loading: false,
-        error: null,
-      });
+      mockReturn({});
       const { container } = renderWithDetails();
       expect(container.querySelector('[aria-label]')).toBeNull();
     });
@@ -68,21 +73,13 @@ describe('CharacterDetail', () => {
 
   describe('loading state', () => {
     it('renders spinner while loading', () => {
-      vi.mocked(useCharacterDetail).mockReturnValue({
-        character: null,
-        loading: true,
-        error: null,
-      });
+      mockReturn({ loading: true });
       renderWithDetails(1);
       expect(document.querySelector('.animate-spin')).toBeInTheDocument();
     });
 
     it('does not render character info while loading', () => {
-      vi.mocked(useCharacterDetail).mockReturnValue({
-        character: null,
-        loading: true,
-        error: null,
-      });
+      mockReturn({ loading: true });
       renderWithDetails(1);
       expect(screen.queryByText('Rick Sanchez')).not.toBeInTheDocument();
     });
@@ -90,11 +87,7 @@ describe('CharacterDetail', () => {
 
   describe('error state', () => {
     it('renders error message', () => {
-      vi.mocked(useCharacterDetail).mockReturnValue({
-        character: null,
-        loading: false,
-        error: 'No characters found for your search.',
-      });
+      mockReturn({ error: 'No characters found for your search.' });
       renderWithDetails(999);
       expect(
         screen.getByText('No characters found for your search.')
@@ -102,25 +95,15 @@ describe('CharacterDetail', () => {
     });
 
     it('renders close button on error', () => {
-      vi.mocked(useCharacterDetail).mockReturnValue({
-        character: null,
-        loading: false,
-        error: 'Something went wrong.',
-      });
+      mockReturn({ error: 'Something went wrong.' });
       renderWithDetails(999);
-      expect(
-        screen.getByRole('button', { name: /close/i })
-      ).toBeInTheDocument();
+      expect(screen.getByRole('button', { name: /close/i })).toBeInTheDocument();
     });
   });
 
   describe('character data', () => {
     beforeEach(() => {
-      vi.mocked(useCharacterDetail).mockReturnValue({
-        character: mockCharacterDetail,
-        loading: false,
-        error: null,
-      });
+      mockReturn({ character: mockCharacterDetail });
     });
 
     it('renders character name', () => {
@@ -176,6 +159,21 @@ describe('CharacterDetail', () => {
         screen.getByRole('button', { name: /close details/i })
       ).toBeInTheDocument();
     });
+
+    it('renders refresh button', () => {
+      renderWithDetails(1);
+      expect(
+        screen.getByRole('button', { name: /refresh details/i })
+      ).toBeInTheDocument();
+    });
+
+    it('calls handleRefresh when refresh button is clicked', async () => {
+      const mockHandleRefresh = vi.fn();
+      mockReturn({ character: mockCharacterDetail, handleRefresh: mockHandleRefresh });
+      renderWithDetails(1);
+      await userEvent.click(screen.getByRole('button', { name: /refresh details/i }));
+      expect(mockHandleRefresh).toHaveBeenCalledTimes(1);
+    });
   });
 
   describe('close behaviour', () => {
@@ -185,8 +183,14 @@ describe('CharacterDetail', () => {
           character: mockCharacterDetail,
           loading: false,
           error: null,
+          handleRefresh: vi.fn(),
         })
-        .mockReturnValue({ character: null, loading: false, error: null });
+        .mockReturnValue({
+          character: null,
+          loading: false,
+          error: null,
+          handleRefresh: vi.fn(),
+        });
 
       renderWithDetails(1);
       expect(screen.getByTestId('search').textContent).toContain('details=1');

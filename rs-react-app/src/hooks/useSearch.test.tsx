@@ -1,5 +1,5 @@
 import { type ReactNode, useState } from 'react';
-import { MemoryRouter } from 'react-router-dom';
+import { MemoryRouter, useSearchParams } from 'react-router-dom';
 
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { act, renderHook, waitFor } from '@testing-library/react';
@@ -28,15 +28,21 @@ vi.mock('@/hooks/useLocalStorage', () => ({
   }),
 }));
 
-const createWrapper = () => {
+const createWrapper = (initialEntry = '/') => {
   const queryClient = new QueryClient({
     defaultOptions: { queries: { retry: false, gcTime: 0 } },
   });
   return ({ children }: { children: ReactNode }) => (
     <QueryClientProvider client={queryClient}>
-      <MemoryRouter>{children}</MemoryRouter>
+      <MemoryRouter initialEntries={[initialEntry]}>{children}</MemoryRouter>
     </QueryClientProvider>
   );
+};
+
+const useSearchAndParams = () => {
+  const search = useSearch();
+  const [searchParams] = useSearchParams();
+  return { ...search, searchParams };
 };
 
 beforeEach(() => {
@@ -129,6 +135,36 @@ describe('useSearch', () => {
 
       act(() => result.current.handleSearch());
       await waitFor(() => expect(fetchCharacters).toHaveBeenCalledTimes(3));
+    });
+  });
+
+  describe('handlePageChange', () => {
+    it('preserves details param when changing page', async () => {
+      vi.mocked(fetchCharacters).mockResolvedValue(mockApiResponse);
+      const { result } = renderHook(() => useSearchAndParams(), {
+        wrapper: createWrapper('/?details=5'),
+      });
+      await waitFor(() => expect(result.current.loading).toBe(false));
+
+      act(() => result.current.handlePageChange(3));
+
+      expect(result.current.searchParams.get('details')).toBe('5');
+      expect(result.current.searchParams.get('page')).toBe('3');
+    });
+  });
+
+  describe('handleSearch', () => {
+    it('preserves details param when resetting to page 1', async () => {
+      vi.mocked(fetchCharacters).mockResolvedValue(mockApiResponse);
+      const { result } = renderHook(() => useSearchAndParams(), {
+        wrapper: createWrapper('/?page=2&details=5'),
+      });
+      await waitFor(() => expect(result.current.loading).toBe(false));
+
+      act(() => result.current.handleSearch());
+
+      expect(result.current.searchParams.get('details')).toBe('5');
+      expect(result.current.searchParams.get('page')).toBe('1');
     });
   });
 
